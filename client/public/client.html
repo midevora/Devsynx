@@ -1,0 +1,564 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevSynx - Client Dashboard</title>
+    <style>
+        :root {
+            --bg: #081120;
+            --panel: rgba(12, 19, 36, 0.82);
+            --panel-border: rgba(255, 255, 255, 0.08);
+            --text: #e8eefc;
+            --muted: #9aa7c0;
+            --accent: #7dd3fc;
+            --accent-2: #60a5fa;
+            --success: #34d399;
+            --warning: #fbbf24;
+            --danger: #fb7185;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            color: var(--text);
+            min-height: 100vh;
+            background:
+                radial-gradient(circle at top left, rgba(96, 165, 250, 0.28), transparent 34%),
+                radial-gradient(circle at top right, rgba(125, 211, 252, 0.16), transparent 28%),
+                linear-gradient(145deg, #050914 0%, #081120 48%, #0f172a 100%);
+        }
+
+        body.light-mode {
+            --bg: #f3f7fc;
+            --panel: rgba(255, 255, 255, 0.9);
+            --panel-border: rgba(15, 23, 42, 0.1);
+            --text: #172033;
+            --muted: #64748b;
+            --accent: #0284c7;
+            --accent-2: #2563eb;
+            background:
+                radial-gradient(circle at top left, rgba(96, 165, 250, 0.2), transparent 34%),
+                radial-gradient(circle at top right, rgba(125, 211, 252, 0.18), transparent 28%),
+                linear-gradient(145deg, #eef5fc 0%, #f8fbff 48%, #e8f0fa 100%);
+        }
+
+        .shell { max-width: 1320px; margin: 0 auto; padding: 28px; }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            gap: 16px;
+            align-items: center;
+            padding: 18px 22px;
+            border: 1px solid var(--panel-border);
+            border-radius: 24px;
+            background: rgba(8, 17, 32, 0.72);
+            backdrop-filter: blur(18px);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.28);
+            margin-bottom: 26px;
+        }
+
+        .brand { display: flex; align-items: center; gap: 14px; }
+        .brand-mark {
+            display: grid;
+            place-items: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            color: #fff;
+            font-size: 20px;
+            background: linear-gradient(135deg, var(--accent-2), var(--accent));
+            box-shadow: 0 8px 18px rgba(37, 99, 235, 0.28);
+        }
+        .brand h1 { font-size: 24px; letter-spacing: -0.03em; }
+        .brand p { margin-top: 6px; color: var(--muted); font-size: 14px; }
+
+        .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+
+        .btn {
+            border: 1px solid transparent;
+            border-radius: 14px;
+            padding: 11px 16px;
+            cursor: pointer;
+            font-weight: 700;
+            color: var(--text);
+            background: rgba(255, 255, 255, 0.07);
+            transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+        }
+
+        .btn:hover { transform: translateY(-1px); border-color: rgba(255, 255, 255, 0.16); }
+        .btn-primary { background: linear-gradient(135deg, var(--accent-2), var(--accent)); color: #04111f; }
+
+        .hero, .content { display: grid; gap: 20px; }
+        .hero { grid-template-columns: 1.4fr 0.9fr; margin-bottom: 22px; }
+        .content { grid-template-columns: 1.35fr 0.85fr; }
+
+        .panel {
+            border: 1px solid var(--panel-border);
+            background: var(--panel);
+            border-radius: 24px;
+            box-shadow: 0 18px 40px rgba(0, 0, 0, 0.24);
+            backdrop-filter: blur(18px);
+        }
+
+        .hero-main { padding: 32px; position: relative; overflow: hidden; }
+        .hero-main::after {
+            content: "";
+            position: absolute;
+            width: 220px;
+            height: 220px;
+            right: -80px;
+            top: -100px;
+            border-radius: 50%;
+            background: rgba(96, 165, 250, 0.12);
+            pointer-events: none;
+        }
+        .hero-kicker {
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+            margin-bottom: 16px;
+            color: var(--accent);
+            font-size: 11px;
+            font-weight: 800;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+        }
+        .hero-kicker::before {
+            content: "";
+            width: 7px;
+            height: 7px;
+            border-radius: 50%;
+            background: var(--success);
+            box-shadow: 0 0 0 4px rgba(52, 211, 153, 0.12);
+        }
+        .hero-main h2 { font-size: clamp(28px, 4vw, 44px); line-height: 1.02; margin-bottom: 14px; }
+        .hero-main p { color: var(--muted); max-width: 60ch; line-height: 1.65; }
+
+        .stat-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-top: 22px; }
+        .stat { padding: 18px; border-radius: 18px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); transition: transform 0.2s ease, border-color 0.2s ease; }
+        .stat:hover { transform: translateY(-2px); border-color: rgba(125, 211, 252, 0.3); }
+        .stat span { display: block; color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; margin-bottom: 10px; }
+        .stat strong { font-size: 28px; }
+
+        .hero-side { padding: 24px; }
+        .hero-side h3 { font-size: 18px; margin-bottom: 5px; }
+        .hero-side::before { content: "A quick view of your delivery health"; display: block; color: var(--muted); font-size: 12px; margin-bottom: 16px; }
+        .highlight-list { list-style: none; display: grid; gap: 12px; }
+        .highlight-list li { display: flex; justify-content: space-between; gap: 10px; align-items: center; padding: 14px 16px; border-radius: 16px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.05); }
+        .highlight-list .label { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em; }
+        .highlight-list strong { display: block; margin-top: 4px; }
+
+        .section { padding: 26px; }
+        .section-header { display: flex; justify-content: space-between; align-items: flex-end; gap: 12px; margin-bottom: 18px; }
+        .section-header h3 { font-size: 20px; }
+        .section-header h3::before { content: ""; display: inline-block; width: 4px; height: 18px; margin-right: 9px; vertical-align: -2px; border-radius: 4px; background: linear-gradient(var(--accent-2), var(--accent)); }
+        .section-header p, .project-meta, .project-top p, .project-footer, .update-item p { color: var(--muted); }
+
+        .project-list, .updates { display: grid; gap: 14px; }
+        .project-list-toolbar {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin: 2px 0 14px;
+        }
+        .project-search {
+            flex: 1;
+            min-width: 180px;
+            padding: 11px 13px;
+            border: 1px solid var(--panel-border);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--text);
+            font: inherit;
+            font-size: 13px;
+        }
+        .project-search:focus {
+            outline: none;
+            border-color: var(--accent-2);
+            box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.14);
+        }
+        .project-search::placeholder { color: var(--muted); }
+        .project-card, .update-item { padding: 20px; border-radius: 18px; background: rgba(255, 255, 255, 0.04); border: 1px solid rgba(255, 255, 255, 0.06); transition: transform 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease; }
+        .project-card:hover, .update-item:hover { transform: translateY(-2px); border-color: rgba(125, 211, 252, 0.28); box-shadow: 0 12px 25px rgba(0, 0, 0, 0.12); }
+        .project-top { display: flex; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+        .project-top h4 { font-size: 18px; margin-bottom: 6px; }
+        .project-top p, .update-item p { font-size: 13px; line-height: 1.5; }
+        .project-footer span { padding: 7px 10px; border-radius: 9px; background: rgba(255, 255, 255, 0.04); }
+
+        .badge { display: inline-flex; align-items: center; gap: 6px; padding: 7px 10px; border-radius: 999px; font-size: 12px; font-weight: 700; white-space: nowrap; }
+        .badge-success { background: rgba(52, 211, 153, 0.14); color: #7ff0c3; }
+        .badge-warning { background: rgba(251, 191, 36, 0.14); color: #fde68a; }
+        .badge-danger { background: rgba(251, 113, 133, 0.14); color: #fecdd3; }
+        .badge-neutral { background: rgba(125, 211, 252, 0.14); color: #bae6fd; }
+
+        .progress-bar { width: 100%; height: 12px; border-radius: 999px; background: rgba(255, 255, 255, 0.08); overflow: hidden; margin: 14px 0 10px; }
+        .progress-fill { height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--accent-2), var(--accent)); box-shadow: 0 0 12px rgba(96, 165, 250, 0.35); }
+        .project-footer { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; margin-top: 10px; font-size: 13px; }
+        .update-item { border-left: 3px solid var(--accent-2); }
+
+        .empty-state { padding: 34px 18px; border-radius: 18px; border: 1px dashed rgba(255, 255, 255, 0.14); color: var(--muted); text-align: center; }
+        .loading { display: grid; place-items: center; min-height: 260px; color: var(--muted); }
+        .error { margin-bottom: 18px; padding: 14px 16px; border-radius: 16px; background: rgba(251, 113, 133, 0.14); border: 1px solid rgba(251, 113, 133, 0.26); color: #fecdd3; }
+        .muted { color: var(--muted); }
+
+        body.light-mode .topbar {
+            background: rgba(255, 255, 255, 0.86);
+            box-shadow: 0 20px 50px rgba(30, 64, 175, 0.1);
+        }
+
+        body.light-mode .btn {
+            color: var(--text);
+            background: rgba(15, 23, 42, 0.06);
+        }
+
+        body.light-mode .btn:hover {
+            border-color: rgba(37, 99, 235, 0.25);
+            background: rgba(37, 99, 235, 0.08);
+        }
+
+        body.light-mode .btn-primary {
+            color: #fff;
+            background: linear-gradient(135deg, var(--accent-2), var(--accent));
+        }
+
+        body.light-mode .panel {
+            box-shadow: 0 18px 40px rgba(30, 64, 175, 0.08);
+        }
+
+        body.light-mode .stat,
+        body.light-mode .highlight-list li,
+        body.light-mode .project-card,
+        body.light-mode .update-item {
+            background: rgba(248, 250, 252, 0.9);
+            border-color: rgba(15, 23, 42, 0.08);
+        }
+
+        body.light-mode .project-footer span {
+            background: rgba(15, 23, 42, 0.045);
+        }
+
+        body.light-mode .project-card:hover,
+        body.light-mode .update-item:hover {
+            box-shadow: 0 12px 25px rgba(30, 64, 175, 0.1);
+        }
+
+        body.light-mode .update-item {
+            border-left-color: var(--accent-2);
+        }
+
+        body.light-mode .progress-bar {
+            background: rgba(15, 23, 42, 0.1);
+        }
+
+        body.light-mode .project-search {
+            background: rgba(248, 250, 252, 0.9);
+            border-color: rgba(15, 23, 42, 0.1);
+        }
+
+        body.light-mode .empty-state {
+            border-color: rgba(15, 23, 42, 0.16);
+        }
+
+        body.light-mode .badge-success {
+            background: rgba(5, 150, 105, 0.12);
+            color: #047857;
+        }
+
+        body.light-mode .badge-warning {
+            background: rgba(217, 119, 6, 0.13);
+            color: #b45309;
+        }
+
+        body.light-mode .badge-danger {
+            background: rgba(225, 29, 72, 0.11);
+            color: #be123c;
+        }
+
+        body.light-mode .badge-neutral {
+            background: rgba(2, 132, 199, 0.12);
+            color: #0369a1;
+        }
+
+        body.light-mode .error {
+            color: #be123c;
+        }
+
+        @media (max-width: 980px) {
+            .hero, .content { grid-template-columns: 1fr; }
+            .stat-strip { grid-template-columns: repeat(2, 1fr); }
+            .topbar { flex-direction: column; align-items: flex-start; }
+        }
+
+        @media (max-width: 620px) {
+            .shell { padding: 16px; }
+            .stat-strip { grid-template-columns: 1fr; }
+            .topbar, .hero-main, .hero-side, .section { border-radius: 18px; padding: 18px; }
+        }
+    </style>
+</head>
+<body>
+    <div class="shell">
+        <header class="topbar">
+            <div class="brand">
+                <div class="brand-mark" aria-hidden="true">DS</div>
+                <div>
+                    <h1>DevSynx Client Panel</h1>
+                    <p>Track assigned projects and monitor live delivery progress.</p>
+                </div>
+            </div>
+            <div class="actions">
+                <button class="btn" id="refreshBtn">Refresh</button>
+                <button class="btn" id="themeToggleBtn" type="button" aria-pressed="false">☀️ Light Mode</button>
+                <button class="btn btn-primary" onclick="logout()">Logout</button>
+            </div>
+        </header>
+
+        <section class="hero">
+            <div class="panel hero-main">
+                <div id="heroContent" class="loading">Loading your dashboard...</div>
+            </div>
+            <aside class="panel hero-side">
+                <h3>Live Status</h3>
+                <ul class="highlight-list" id="statusHighlights"></ul>
+            </aside>
+        </section>
+
+        <section class="content">
+            <div class="panel section">
+                <div class="section-header">
+                    <div>
+                        <h3>Your Projects</h3>
+                        <p>Only projects linked to your account appear here.</p>
+                    </div>
+                    <p id="projectCount" class="muted"></p>
+                </div>
+                <div class="project-list-toolbar" aria-label="Project list search">
+                    <input
+                        id="projectSearch"
+                        class="project-search"
+                        type="search"
+                        placeholder="🔍 Search projects by name or description..."
+                        aria-label="Search projects"
+                    >
+                </div>
+                <div id="projectsList" class="project-list">
+                    <div class="loading">Loading project progress...</div>
+                </div>
+            </div>
+
+            <div class="panel section">
+                <div class="section-header">
+                    <div>
+                        <h3>Recent Updates</h3>
+                        <p>Latest task activity across your projects.</p>
+                    </div>
+                </div>
+                <div id="updatesList" class="updates">
+                    <div class="loading">Loading updates...</div>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script>
+        const apiBase = '/api';
+        let currentUser = null;
+        let allClientProjects = [];
+
+        function applyTheme(theme) {
+            const isLight = theme === 'light';
+            document.body.classList.toggle('light-mode', isLight);
+
+            const toggle = document.getElementById('themeToggleBtn');
+            if (toggle) {
+                toggle.textContent = isLight ? '🌙 Dark Mode' : '☀️ Light Mode';
+                toggle.setAttribute('aria-pressed', String(isLight));
+            }
+        }
+
+        function toggleTheme() {
+            const nextTheme = document.body.classList.contains('light-mode') ? 'dark' : 'light';
+            localStorage.setItem('clientTheme', nextTheme);
+            applyTheme(nextTheme);
+        }
+
+        function getStatusLabel(progress) {
+            if (progress >= 100) return { label: 'Complete', className: 'badge-success' };
+            if (progress >= 60) return { label: 'On Track', className: 'badge-neutral' };
+            if (progress >= 30) return { label: 'In Progress', className: 'badge-warning' };
+            return { label: 'Needs Attention', className: 'badge-danger' };
+        }
+
+        function formatDate(value) {
+            if (!value) return 'Not updated yet';
+            const date = new Date(value);
+            if (Number.isNaN(date.getTime())) return 'Not updated yet';
+            return date.toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' });
+        }
+
+        function renderHighlights(summary) {
+            const highlights = document.getElementById('statusHighlights');
+            highlights.innerHTML = `
+                <li><div><span class="label">Overall progress</span><strong>${summary.overallProgress}%</strong></div><span class="badge badge-neutral">${summary.totalProjects} projects</span></li>
+                <li><div><span class="label">Completed tasks</span><strong>${summary.completedTasks}</strong></div><span class="badge badge-success">Done</span></li>
+                <li><div><span class="label">In progress</span><strong>${summary.inProgressTasks}</strong></div><span class="badge badge-warning">Working</span></li>
+                <li><div><span class="label">Pending</span><strong>${summary.pendingTasks}</strong></div><span class="badge badge-danger">Waiting</span></li>
+            `;
+        }
+
+        function renderHero(user, summary) {
+            const hero = document.getElementById('heroContent');
+            hero.innerHTML = `
+                <div style="display:flex; justify-content:space-between; gap:16px; align-items:flex-start; flex-wrap:wrap;">
+                    <div>
+                        <div class="hero-kicker">Client workspace</div>
+                        <h2>Welcome, ${user.name}</h2>
+                        <p>Review the projects assigned to ${user.email} and check how much work is completed, active, or still pending.</p>
+                    </div>
+                    <div class="badge badge-neutral">Client access</div>
+                </div>
+                <div class="stat-strip">
+                    <div class="stat"><span>Projects</span><strong>${summary.totalProjects}</strong></div>
+                    <div class="stat"><span>Completed</span><strong>${summary.completedTasks}</strong></div>
+                    <div class="stat"><span>In Progress</span><strong>${summary.inProgressTasks}</strong></div>
+                    <div class="stat"><span>Overall</span><strong>${summary.overallProgress}%</strong></div>
+                </div>
+            `;
+        }
+
+        function renderProjects(projects) {
+            const list = document.getElementById('projectsList');
+            const count = document.getElementById('projectCount');
+            allClientProjects = projects;
+            renderFilteredProjects('');
+        }
+
+        function renderFilteredProjects(searchTerm) {
+            const list = document.getElementById('projectsList');
+            const count = document.getElementById('projectCount');
+            const normalizedSearch = searchTerm.trim().toLowerCase();
+            const projects = allClientProjects.filter((project) => {
+                if (!normalizedSearch) return true;
+                return [project.name, project.description]
+                    .filter(Boolean)
+                    .some((value) => String(value).toLowerCase().includes(normalizedSearch));
+            });
+
+            count.textContent = normalizedSearch
+                ? `${projects.length} of ${allClientProjects.length} projects`
+                : `${projects.length} linked project${projects.length === 1 ? '' : 's'}`;
+
+            if (!projects.length) {
+                list.innerHTML = `
+                    <div class="empty-state">
+                        ${normalizedSearch
+                            ? `No projects match “${searchTerm}”.`
+                            : `No projects are linked to this client account.
+                               <div style="margin-top:8px;">Once a project is assigned in the database, it will appear here automatically.</div>`}
+                    </div>
+                `;
+                return;
+            }
+
+            list.innerHTML = projects.map((project) => {
+                const status = getStatusLabel(project.progress_percent);
+                const progress = Math.max(0, Math.min(100, project.progress_percent || 0));
+                return `
+                    <article class="project-card">
+                        <div class="project-top">
+                            <div>
+                                <h4>${project.name}</h4>
+                                <p>${project.description || 'No description available.'}</p>
+                            </div>
+                            <span class="badge ${status.className}">${status.label}</span>
+                        </div>
+                        <div class="progress-bar" aria-label="Project progress"><div class="progress-fill" style="width: ${progress}%"></div></div>
+                        <div class="project-meta">${progress}% complete</div>
+                        <div class="project-footer">
+                            <span>Total tasks: ${project.total_tasks}</span>
+                            <span>Completed: ${project.completed_tasks}</span>
+                            <span>In progress: ${project.in_progress_tasks}</span>
+                            <span>Pending: ${project.pending_tasks}</span>
+                            <span>Last update: ${formatDate(project.last_update)}</span>
+                        </div>
+                    </article>
+                `;
+            }).join('');
+        }
+
+        function renderUpdates(projects) {
+            const updates = document.getElementById('updatesList');
+            const sorted = [...projects]
+                .filter((project) => project.last_update)
+                .sort((left, right) => new Date(right.last_update) - new Date(left.last_update))
+                .slice(0, 5);
+
+            if (!sorted.length) {
+                updates.innerHTML = `<div class="empty-state">No recent task updates yet.</div>`;
+                return;
+            }
+
+            updates.innerHTML = sorted.map((project) => `
+                <article class="update-item">
+                    <h4>${project.name}</h4>
+                    <p>${project.completed_tasks} completed, ${project.in_progress_tasks} in progress, ${project.pending_tasks} pending. Latest activity on ${formatDate(project.last_update)}.</p>
+                </article>
+            `).join('');
+        }
+
+        async function loadDashboard() {
+            const storedUser = localStorage.getItem('user');
+            if (!storedUser) {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            currentUser = JSON.parse(storedUser);
+            if (currentUser.role !== 'client') {
+                window.location.href = 'login.html';
+                return;
+            }
+
+            try {
+                const response = await fetch(`${apiBase}/client/dashboard/${encodeURIComponent(currentUser.email)}`);
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Failed to load client dashboard');
+                }
+
+                renderHero(currentUser, data.summary);
+                renderHighlights(data.summary);
+                renderProjects(data.projects);
+                renderUpdates(data.projects);
+            } catch (error) {
+                document.getElementById('heroContent').innerHTML = `<div class="error">${error.message}</div>`;
+                document.getElementById('statusHighlights').innerHTML = '<li class="empty-state">Unable to load project summary.</li>';
+                document.getElementById('projectsList').innerHTML = '<div class="error">Unable to load projects.</div>';
+                document.getElementById('updatesList').innerHTML = '<div class="error">Unable to load updates.</div>';
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('user');
+            window.location.href = 'login.html';
+        }
+
+        document.getElementById('refreshBtn').addEventListener('click', loadDashboard);
+        document.getElementById('projectSearch').addEventListener('input', (event) => {
+            renderFilteredProjects(event.target.value);
+        });
+        document.getElementById('themeToggleBtn').addEventListener('click', toggleTheme);
+
+        window.addEventListener('load', () => {
+            applyTheme(localStorage.getItem('clientTheme') || 'dark');
+            loadDashboard();
+            setInterval(loadDashboard, 60000);
+        });
+    </script>
+</body>
+</html>

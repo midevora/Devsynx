@@ -1,0 +1,2434 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevSynx - Team Head Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+            overflow: hidden;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e9ecef 100%);
+            color: #2c3e50;
+        }
+
+        .navbar {
+            position: relative;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .menu-btn {
+            position: absolute;
+            left: 40px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 42px;
+            height: 42px;
+            border: 1px solid rgba(255, 255, 255, 0.35);
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.15);
+            color: white;
+            font-size: 22px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .menu-btn:hover {
+            background: rgba(255, 255, 255, 0.25);
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-left: 62px;
+        }
+
+        .navbar-title {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            margin: 0;
+            font-size: 22px;
+            font-weight: 700;
+            white-space: nowrap;
+        }
+
+        .navbar-brand h1 {
+            font-size: 28px;
+            margin: 0;
+        }
+
+        .navbar-brand p {
+            font-size: 12px;
+            opacity: 0.9;
+            margin: 0;
+        }
+
+        .navbar-user {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .profile-btn {
+            background-color: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .profile-btn:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+            transform: scale(1.05);
+        }
+
+        .drawer-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 999;
+            animation: fadeIn 0.3s ease-in;
+        }
+
+        .drawer {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 360px;
+            height: 100vh;
+            background: white;
+            box-shadow: 4px 0 15px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+            overflow-y: auto;
+            overflow-x: hidden;
+            animation: slideInLeft 0.3s ease-out;
+            display: flex;
+            flex-direction: column;
+        }
+
+        @keyframes slideInLeft {
+            from { transform: translateX(-100%); }
+            to { transform: translateX(0); }
+        }
+
+        .drawer-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 30px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .drawer-header h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .close-btn:hover {
+            transform: scale(1.2);
+        }
+
+        .drawer-content {
+            padding: 30px;
+        }
+
+        .workspace-drawer .drawer-content {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            min-height: 0;
+            flex: 0 0 auto;
+            overflow: visible;
+        }
+
+        .workspace-drawer-scroll {
+            flex: 0 0 auto;
+            overflow: visible;
+            overscroll-behavior: contain;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(102, 126, 234, 0.45) rgba(102, 126, 234, 0.06);
+        }
+
+        .workspace-drawer-scroll::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .workspace-drawer-scroll::-webkit-scrollbar-track {
+            background: rgba(102, 126, 234, 0.06);
+            border-radius: 4px;
+        }
+
+        .workspace-drawer-scroll::-webkit-scrollbar-thumb {
+            background: rgba(102, 126, 234, 0.45);
+            border-radius: 4px;
+        }
+
+        .project-drawer-section {
+            display: flex;
+            flex-direction: column;
+            flex: 0 0 auto;
+            padding-bottom: 20px;
+            border-bottom: 1px solid #edf0f7;
+        }
+
+        .drawer-option {
+            width: 100%;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 13px 14px;
+            margin-top: 16px;
+            border: 1px solid #edf0f7;
+            border-radius: 9px;
+            background: #fff;
+            color: #2c3e50;
+            font: inherit;
+            font-size: 14px;
+            font-weight: 700;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .drawer-option:hover,
+        .drawer-option[aria-expanded="true"] {
+            background: #eef0ff;
+            border-color: #667eea;
+            color: #667eea;
+        }
+
+        .project-drawer-title {
+            color: #2c3e50;
+            font-size: 14px;
+            font-weight: 700;
+            margin-bottom: 12px;
+        }
+
+        .project-drawer-list {
+            max-height: none;
+            overflow: visible;
+            padding-right: 6px;
+        }
+
+        .project-drawer-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .project-drawer-list::-webkit-scrollbar-track {
+            background: #edf0f7;
+            border-radius: 999px;
+        }
+
+        .project-drawer-list::-webkit-scrollbar-thumb {
+            background: linear-gradient(180deg, #667eea, #764ba2);
+            border-radius: 999px;
+        }
+
+        .project-card {
+            width: 100%;
+            border: 1px solid #edf0f7;
+            border-left: 4px solid #667eea;
+            border-radius: 9px;
+            background: #fff;
+            padding: 12px;
+            margin-bottom: 9px;
+            color: #2c3e50;
+            cursor: pointer;
+            text-align: left;
+            transition: all 0.2s;
+        }
+
+        .project-card:hover,
+        .project-card.active {
+            background: #eef0ff;
+            border-color: #667eea;
+            transform: translateX(3px);
+        }
+
+        .project-card-name {
+            font-weight: 700;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+
+        .project-card-info {
+            color: #8993a4;
+            font-size: 12px;
+        }
+
+        .workspace-profile {
+            flex: 0 0 auto;
+            max-height: none;
+            overflow: visible;
+            padding-top: 20px;
+            scrollbar-width: thin;
+            scrollbar-color: rgba(102, 126, 234, 0.45) rgba(102, 126, 234, 0.06);
+            overscroll-behavior: contain;
+            touch-action: pan-y;
+        }
+
+        .workspace-profile::-webkit-scrollbar {
+            width: 5px;
+        }
+
+        .workspace-profile::-webkit-scrollbar-track {
+            background: rgba(102, 126, 234, 0.06);
+            border-radius: 4px;
+        }
+
+        .workspace-profile::-webkit-scrollbar-thumb {
+            background: rgba(102, 126, 234, 0.45);
+            border-radius: 4px;
+        }
+
+        .workspace-profile .profile-picture {
+            width: 86px;
+            height: 86px;
+            font-size: 36px;
+            border-width: 3px;
+            margin-bottom: 12px;
+        }
+
+        .workspace-profile .profile-info {
+            margin-bottom: 16px;
+        }
+
+        .workspace-profile .profile-info h3 {
+            font-size: 17px;
+        }
+
+        .workspace-profile .profile-edit-section {
+            margin-top: 0;
+            padding: 14px;
+        }
+
+        .profile-picture {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: #f0f2f5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 60px;
+            margin: 0 auto 20px;
+            border: 4px solid #667eea;
+            cursor: pointer;
+            transition: all 0.3s;
+            overflow: hidden;
+        }
+
+        .profile-picture:hover {
+            box-shadow: 0 8px 15px rgba(102, 126, 234, 0.3);
+        }
+
+        .profile-picture img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .profile-info {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .profile-info h3 {
+            font-size: 20px;
+            color: #2c3e50;
+            margin: 10px 0 5px 0;
+        }
+
+        .profile-info p {
+            color: #7f8c8d;
+            margin: 0;
+        }
+
+        .profile-edit-section {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .profile-edit-section h4 {
+            color: #2c3e50;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .profile-input {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 14px;
+            margin-bottom: 15px;
+            font-family: inherit;
+        }
+
+        .profile-input:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 5px rgba(102, 126, 234, 0.3);
+        }
+
+        .profile-btn-save {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 10px;
+        }
+
+        .profile-btn-save:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .profile-btn-logout {
+            width: 100%;
+            padding: 12px;
+            background: rgba(233, 62, 59, 0.8);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .profile-btn-logout:hover {
+            background: rgba(233, 62, 59, 1);
+            transform: translateY(-2px);
+        }
+
+        .file-input-hidden {
+            display: none;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .dashboard-wrapper {
+            height: 100vh;
+            min-height: 0;
+            padding: 0;
+            background: white;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .header-section {
+            display: none;
+        }
+
+        .container {
+            width: 100%;
+            background: white;
+            padding: 0;
+            border-radius: 0;
+            box-shadow: none;
+            overflow: hidden;
+            display: grid;
+            grid-template-columns: 1fr;
+            min-height: 0;
+            flex: 1;
+        }
+
+        .sidebar {
+            display: none;
+        }
+
+        .sidebar-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .team-card {
+            background: white;
+            padding: 16px;
+            margin-bottom: 12px;
+            border-radius: 8px;
+            border: 2px solid transparent;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border-left: 4px solid #667eea;
+        }
+
+        .team-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.15);
+            transform: translateX(4px);
+        }
+
+        .team-card.active {
+            background: linear-gradient(135deg, #667eea 0%, #5a67d8 100%);
+            color: white;
+            border-color: #5a67d8;
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.3);
+        }
+
+        .team-card-name {
+            font-weight: 700;
+            font-size: 15px;
+            margin-bottom: 6px;
+        }
+
+        .team-card-info {
+            font-size: 12px;
+            opacity: 0.7;
+            line-height: 1.5;
+        }
+
+        .team-card.active .team-card-info {
+            opacity: 0.95;
+        }
+
+        .main-content {
+            background: white;
+            padding: 25px;
+            overflow-y: auto;
+            height: 100%;
+        }
+
+        .loading-spinner {
+            text-align: center;
+            padding: 40px 25px;
+            font-size: 16px;
+            color: #7f8c8d;
+        }
+
+        .error-box {
+            background-color: #f8d7da;
+            color: #721c24;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #f5b7b1;
+            font-size: 14px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #667eea;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .project-header {
+            margin-bottom: 20px;
+        }
+
+        .project-name {
+            font-size: 24px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 6px;
+        }
+
+        .project-description {
+            font-size: 13px;
+            color: #7f8c8d;
+            line-height: 1.5;
+            margin-bottom: 15px;
+        }
+
+        .team-members-section {
+            margin-bottom: 20px;
+        }
+
+        .members-title {
+            font-size: 14px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .members-list {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .member-badge {
+            background: linear-gradient(135deg, #667eea 0%, #5a67d8 100%);
+            color: white;
+            padding: 8px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .member-badge:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .member-badge.active {
+            background: linear-gradient(135deg, #5a67d8 0%, #4c51bf 100%);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+            transform: translateY(-2px) scale(1.05);
+        }
+
+        .divide-tasks-section {
+            background: linear-gradient(135deg, #f8f9fa 0%, #f0f2f5 100%);
+            padding: 20px;
+            border-radius: 12px;
+            border: 2px solid #e9ecef;
+            margin-bottom: 30px;
+        }
+
+        .divide-tasks-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+
+        .divide-tasks-title {
+            font-size: 15px;
+            font-weight: 700;
+            color: #2c3e50;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .divide-btn {
+            background: linear-gradient(135deg, #667eea 0%, #5a67d8 100%);
+            color: white;
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .divide-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
+
+        .tasks-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+        }
+
+        .tasks-subsection {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid #e9ecef;
+        }
+
+        .tasks-subsection-title {
+            font-size: 13px;
+            font-weight: 700;
+            color: #2c3e50;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .existing-tasks-list {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .task-item {
+            background: linear-gradient(135deg, #f8f9fa 0%, #f0f2f5 100%);
+            padding: 10px;
+            border-radius: 6px;
+            border-left: 4px solid #667eea;
+            transition: all 0.3s ease;
+        }
+
+        .task-item:hover {
+            border-color: #5a67d8;
+            box-shadow: 0 3px 12px rgba(102, 126, 234, 0.1);
+        }
+
+        .task-item-name {
+            font-weight: 700;
+            color: #2c3e50;
+            font-size: 13px;
+            margin-bottom: 5px;
+        }
+
+        .task-item-meta {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            font-size: 11px;
+        }
+
+        .task-badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+
+        .complexity-low {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .complexity-medium {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .complexity-high {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .status-pending {
+            background: #d1ecf1;
+            color: #0c5460;
+        }
+
+        .status-in_progress {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        .status-completed {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .task-dropdown-menu {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: white;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            z-index: 10;
+            min-width: 120px;
+            overflow: hidden;
+        }
+
+        .task-dropdown-item {
+            display: block;
+            width: 100%;
+            padding: 10px 15px;
+            border: none;
+            background: white;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 600;
+            text-align: left;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .task-dropdown-edit {
+            color: #667eea;
+            border-bottom: 1px solid #f0f2f5;
+        }
+
+        .task-dropdown-edit:hover {
+            background: #f8f9fa;
+        }
+
+        .task-dropdown-delete {
+            color: #e74c3c;
+        }
+
+        .task-dropdown-delete:hover {
+            background: #ffe5e1;
+        }
+
+        .task-dropdown-delete:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 20px 15px;
+            color: #95a5a6;
+        }
+
+        .empty-state-icon {
+            font-size: 28px;
+            margin-bottom: 8px;
+        }
+
+        .empty-state-text {
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .back-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: white;
+            color: #667eea;
+            border: 2px solid #667eea;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 13px;
+            transition: all 0.3s ease;
+            margin-top: 15px;
+        }
+
+        .back-button:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        @media (max-width: 1024px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+
+            .tasks-container {
+                grid-template-columns: 1fr;
+            }
+
+            .sidebar {
+                display: grid;
+                grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+                gap: 15px;
+                padding: 20px;
+                border-right: none;
+                border-bottom: 1px solid #e9ecef;
+            }
+
+            .team-card {
+                margin-bottom: 0;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .navbar {
+                padding: 15px 20px;
+                min-height: 82px;
+            }
+
+            .menu-btn {
+                left: 20px;
+            }
+
+            .navbar-brand {
+                margin-left: 52px;
+            }
+
+            .navbar-title {
+                position: static;
+                transform: none;
+                margin: 12px auto 0;
+                text-align: center;
+                font-size: 18px;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .page-title {
+                font-size: 24px;
+            }
+
+            .tasks-container {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Dark Mode Styles */
+        .dark-mode {
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+
+        .dark-mode body {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        .dark-mode .dashboard-wrapper {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        .dark-mode .navbar {
+            background: linear-gradient(135deg, #1e1e2e 0%, #16213e 100%);
+        }
+
+        .dark-mode .container {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        .dark-mode .profile-btn,
+        .dark-mode .theme-toggle-btn,
+        .dark-mode .profile-btn-save,
+        .dark-mode .profile-btn-logout {
+            background-color: rgba(102, 126, 234, 0.2);
+            color: #e0e0e0;
+            border-color: #667eea;
+        }
+
+        .dark-mode .profile-btn:hover,
+        .dark-mode .theme-toggle-btn:hover,
+        .dark-mode .profile-btn-save:hover,
+        .dark-mode .profile-btn-logout:hover {
+            background-color: rgba(102, 126, 234, 0.3);
+        }
+
+        .dark-mode .drawer {
+            background-color: #2a2a3e;
+            color: #e0e0e0;
+        }
+
+        .dark-mode .drawer-header {
+            background-color: #1e1e2e;
+            border-bottom: 1px solid #404050;
+        }
+
+        .dark-mode .drawer-header h2 {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .drawer-overlay {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .dark-mode .profile-info h3,
+        .dark-mode .profile-info p {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .profile-picture {
+            background-color: #1e1e2e;
+            border-color: #667eea;
+        }
+
+        .dark-mode .profile-edit-section {
+            background-color: #1e1e2e;
+            border: 1px solid #404050;
+        }
+
+        .dark-mode .profile-edit-section h4 {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .profile-btn-save {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .dark-mode .profile-btn-save:hover {
+            opacity: 0.9;
+        }
+
+        .dark-mode .theme-toggle-btn {
+            width: 100%;
+            padding: 12px;
+            background-color: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: 'pointer';
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+
+        .dark-mode .theme-toggle-btn:hover {
+            background-color: #5a67d8;
+        }
+
+        .dark-mode .profile-input {
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+            border-color: #404050;
+        }
+
+        .dark-mode .profile-input:focus {
+            border-color: #667eea;
+            background-color: #1a1a2e;
+        }
+
+        .dark-mode .sidebar {
+            background: linear-gradient(135deg, #1e1e2e 0%, #16213e 100%);
+            color: #e0e0e0;
+            border-right-color: #404050;
+        }
+
+        .dark-mode .sidebar-title {
+            color: #667eea;
+        }
+
+        .dark-mode .main-content {
+            background-color: #121212;
+            color: #e0e0e0;
+        }
+
+        .dark-mode .team-card {
+            background: #2a2a3e;
+            color: #e0e0e0;
+            border-left-color: #667eea;
+            border-color: #404050;
+        }
+
+        .dark-mode .team-card:hover {
+            background-color: #333349;
+            border-color: #667eea;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .dark-mode .team-card.active {
+            background: linear-gradient(135deg, #667eea 0%, #5a67d8 100%);
+            color: white;
+            border-color: #5a67d8;
+        }
+
+        .dark-mode .team-card-name {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .team-card.active .team-card-name {
+            color: white;
+        }
+
+        .dark-mode .team-card-info {
+            color: #b0b0b0;
+        }
+
+        .dark-mode .team-card.active .team-card-info {
+            color: rgba(255, 255, 255, 0.95);
+        }
+
+        .dark-mode .loading-spinner {
+            color: #b0b0b0;
+        }
+
+        .dark-mode .error-box {
+            background-color: #3d2b2b;
+            color: #ff6b6b;
+            border-color: #5a3434;
+        }
+
+        .dark-mode .section-title {
+            color: #e0e0e0;
+            border-bottom-color: #667eea;
+        }
+
+        .dark-mode .project-header {
+            background-color: #1e1e2e;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #404050;
+            margin-bottom: 20px;
+        }
+
+        .dark-mode .project-name {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .project-description {
+            color: #b0b0b0;
+        }
+
+        .dark-mode .team-members-section {
+            background-color: #1e1e2e;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #404050;
+            margin-bottom: 20px;
+        }
+
+        .dark-mode .members-title {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .members-list {
+            background-color: transparent;
+        }
+
+        .dark-mode .member-badge {
+            background: linear-gradient(135deg, #667eea 0%, #5a67d8 100%);
+            color: white;
+            border: none;
+        }
+
+        .dark-mode .member-badge:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #4c51bf 100%);
+        }
+
+        .dark-mode .member-badge.active {
+            background: linear-gradient(135deg, #4c51bf 0%, #3f45a0 100%);
+        }
+
+        .dark-mode .divide-tasks-section {
+            background: #1e1e2e;
+            border: 2px solid #404050;
+            color: #e0e0e0;
+        }
+
+        .dark-mode .divide-tasks-title {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .divide-btn {
+            background: linear-gradient(135deg, #667eea 0%, #5a67d8 100%);
+            color: white;
+        }
+
+        .dark-mode .divide-btn:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #4c51bf 100%);
+        }
+
+        .dark-mode .tasks-subsection {
+            background: #2a2a3e;
+            color: #e0e0e0;
+            border: 1px solid #404050;
+        }
+
+        .dark-mode .tasks-subsection-title {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .developer-tasks-section {
+            background-color: #1e1e2e;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #404050;
+            margin-bottom: 20px;
+        }
+
+        .dark-mode .developer-name {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .developer-tasks-header {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .task-item {
+            background-color: #2a2a3e;
+            color: #e0e0e0;
+            border-color: #404050;
+        }
+
+        .dark-mode .task-item:hover {
+            background-color: #333349;
+            border-color: #667eea;
+        }
+
+        .dark-mode .task-item-name {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .task-item-meta {
+            color: #b0b0b0;
+        }
+
+        .dark-mode .task-badge {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .complexity-low {
+            background-color: #2d5a3d;
+            color: #5ecb7a;
+        }
+
+        .dark-mode .complexity-medium {
+            background-color: #5a4d2d;
+            color: #ffb84d;
+        }
+
+        .dark-mode .complexity-high {
+            background-color: #5a2d2d;
+            color: #ff6b6b;
+        }
+
+        .dark-mode .status-pending {
+            background-color: #3d414a;
+            color: #a0aab6;
+        }
+
+        .dark-mode .status-in_progress {
+            background-color: #4a4a2d;
+            color: #ffd700;
+        }
+
+        .dark-mode .status-completed {
+            background-color: #2d4a3d;
+            color: #5ecb7a;
+        }
+
+        .dark-mode .task-dropdown-menu {
+            background-color: #2a2a3e;
+            border: 1px solid #404050;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+        }
+
+        .dark-mode .task-dropdown-item {
+            color: #e0e0e0;
+            border-bottom-color: #404050;
+        }
+
+        .dark-mode .task-dropdown-item:hover {
+            background-color: #333349;
+        }
+
+        .dark-mode .task-dropdown-edit {
+            color: #667eea;
+        }
+
+        .dark-mode .task-dropdown-delete {
+            color: #ff6b6b;
+        }
+
+        .dark-mode .edit-modal-overlay {
+            background-color: rgba(0, 0, 0, 0.7);
+        }
+
+        .dark-mode .edit-modal {
+            background-color: #2a2a3e;
+            color: #e0e0e0;
+        }
+
+        .dark-mode .edit-modal h2 {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .form-group label {
+            color: #e0e0e0;
+        }
+
+        .dark-mode input,
+        .dark-mode select,
+        .dark-mode textarea {
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+            border-color: #404050;
+        }
+
+        .dark-mode input::placeholder,
+        .dark-mode textarea::placeholder {
+            color: #707070;
+        }
+
+        .dark-mode input:focus,
+        .dark-mode select:focus,
+        .dark-mode textarea:focus {
+            border-color: #667eea;
+            background-color: #1a1a2e;
+            color: #e0e0e0;
+        }
+
+        .dark-mode .empty-state {
+            background-color: #1e1e2e;
+            color: #b0b0b0;
+            border: 1px solid #404050;
+        }
+
+        .dark-mode .empty-state-text {
+            color: #b0b0b0;
+        }
+
+        .dark-mode .tasks-subsection {
+            background: #2a2a3e;
+            color: #e0e0e0;
+            border: 1px solid #404050;
+        }
+
+        .dark-mode .tasks-container {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .existing-tasks-list {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .task-item {
+            background: linear-gradient(135deg, #333349 0%, #2a2a3e 100%);
+            color: #e0e0e0;
+            border-left-color: #667eea;
+            border-color: #404050;
+        }
+
+        .dark-mode .task-item:hover {
+            background: linear-gradient(135deg, #3f3f5a 0%, #333349 100%);
+            border-color: #667eea;
+            box-shadow: 0 3px 12px rgba(102, 126, 234, 0.3);
+        }
+
+        .dark-mode .task-item-name {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .task-item-meta span {
+            color: #b0b0b0;
+        }
+
+        .dark-mode .task-item-meta span[style*="color: #667eea"] {
+            color: #667eea !important;
+        }
+
+        .dark-mode .tasks-subsection-title {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .divide-tasks-section {
+            background: #1e1e2e;
+            border: 2px solid #404050;
+            color: #e0e0e0;
+        }
+
+        .dark-mode .divide-tasks-header {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .divide-tasks-title {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .divide-btn {
+            background: linear-gradient(135deg, #667eea 0%, #5a67d8 100%);
+            color: white;
+        }
+
+        .dark-mode .divide-btn:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #4c51bf 100%);
+        }
+
+        .dark-mode .team-member-badge {
+            background-color: #2a2a3e;
+            color: #e0e0e0;
+            border-color: #404050;
+        }
+
+        .dark-mode .team-member-badge:hover {
+            background-color: #333349;
+        }
+
+        .theme-toggle-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 2px solid rgba(255, 255, 255, 0.3);
+            padding: 10px 16px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 14px;
+            width: 100%;
+            margin-bottom: 15px;
+        }
+
+        .theme-toggle-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.5);
+        }
+
+        .dark-mode .theme-toggle-btn {
+            background: rgba(102, 126, 234, 0.2);
+            color: #e0e0e0;
+            border: 2px solid #667eea;
+        }
+
+        .dark-mode .theme-toggle-btn:hover {
+            background: rgba(102, 126, 234, 0.3);
+            border-color: #667eea;
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-wrapper">
+        <div class="navbar">
+            <button class="menu-btn" onclick="openWorkspaceDrawer()" aria-label="Open dashboard navigation">☰</button>
+            <div class="navbar-brand">
+                <div>
+                    <h1>🎯 DevSynx</h1>
+                    <p>Project Management System</p>
+                </div>
+            </div>
+            <h2 class="navbar-title">Team Head Dashboard</h2>
+            <div class="navbar-user">
+            </div>
+        </div>
+
+        <!-- Workspace Drawer -->
+        <div id="workspaceDrawer" class="drawer workspace-drawer" style="display: none;">
+            <div class="drawer-header">
+                <h2>Workspace</h2>
+                <button class="close-btn" onclick="closeWorkspaceDrawer()">✕</button>
+            </div>
+            <div class="drawer-content">
+                <div class="workspace-drawer-scroll">
+                    <div class="project-drawer-section">
+                        <div class="project-drawer-title">📁 Your Projects</div>
+                        <div id="projectsList" class="project-drawer-list"></div>
+                    </div>
+                </div>
+
+                <button id="profileSettingsBtn" class="drawer-option" type="button" aria-expanded="false" aria-controls="profileSettingsPanel" onclick="toggleProfileSettings()">
+                    <span aria-hidden="true">👤</span>
+                    <span>Profile Settings</span>
+                </button>
+
+                <div id="profileSettingsPanel" class="workspace-profile" style="display: none;">
+                    <div class="profile-picture" onclick="document.getElementById('fileInput').click()">
+                        <span id="profileEmoji">👤</span>
+                        <img id="profileImg" style="display: none;" />
+                    </div>
+                    <input type="file" id="fileInput" class="file-input-hidden" accept="image/*" onchange="handleProfilePictureChange(event)" />
+                    
+                    <div class="profile-info">
+                        <h3 id="profileName">Team Head</h3>
+                        <p id="profileEmail">team.head@devsynx.com</p>
+                    </div>
+
+                    <div class="profile-edit-section">
+                        <h4>Edit Profile</h4>
+                        <input type="text" class="profile-input" id="profileNameInput" placeholder="Enter your name" />
+                        <button class="profile-btn-save" onclick="handleSaveProfile()">💾 Save Changes</button>
+                        <button class="theme-toggle-btn" onclick="window.ReactApp.toggleTheme()" id="themeToggleBtn">🌙 Dark Mode</button>
+                        <button class="profile-btn-logout" onclick="logout()">🚪 Sign Out</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div id="workspaceOverlay" class="drawer-overlay" style="display: none;" onclick="closeWorkspaceDrawer()"></div>
+
+        <div class="container">
+            <!-- Main Content -->
+            <div class="main-content">
+                <div id="root"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- React Libraries with Development Versions (easier to debug) -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- Main Application -->
+    <script>
+        // Wait for React and Babel to load
+        window.ReactReady = new Promise((resolve, reject) => {
+            let attempts = 0;
+            const maxAttempts = 50; // 5 seconds
+            
+            const check = setInterval(() => {
+                attempts++;
+                console.log('⏳ React check attempt', attempts);
+                
+                if (typeof React !== 'undefined' && 
+                    typeof ReactDOM !== 'undefined' && 
+                    typeof Babel !== 'undefined') {
+                    clearInterval(check);
+                    console.log('✅ React libraries loaded after', attempts, 'attempts');
+                    resolve();
+                } else if (attempts >= maxAttempts) {
+                    clearInterval(check);
+                    console.error('❌ React libraries failed to load');
+                    reject(new Error('React libraries not loaded'));
+                }
+            }, 100);
+        });
+    </script>
+
+    <script type="text/babel">
+        // This runs AFTER React is available
+        
+        // ============================================
+        // Team Head Dashboard Component
+        // ============================================
+        function TeamHeadDashboard() {
+            const [dashboardData, setDashboardData] = React.useState(null);
+            const [currentTeam, setCurrentTeam] = React.useState(null);
+            const [teamMembers, setTeamMembers] = React.useState([]);
+            const [loading, setLoading] = React.useState(true);
+            const [error, setError] = React.useState('');
+            const [teamTasks, setTeamTasks] = React.useState([]);
+            const [selectedDeveloper, setSelectedDeveloper] = React.useState(null);
+            const [developerTasks, setDeveloperTasks] = React.useState([]);
+            const [tasksLoading, setTasksLoading] = React.useState(false);
+            const [openTaskDropdown, setOpenTaskDropdown] = React.useState(null);
+            const [editingTaskId, setEditingTaskId] = React.useState(null);
+            const [editTaskData, setEditTaskData] = React.useState(null);
+            const [deletingTaskId, setDeletingTaskId] = React.useState(null);
+            const [darkMode, setDarkMode] = React.useState(localStorage.getItem('darkMode') === 'true');
+
+            React.useEffect(() => {
+                console.log('📍 useEffect: Fetching dashboard');
+                // Store setDarkMode reference in window.ReactApp for external access
+                window.ReactApp.setDarkModeRef(setDarkMode);
+                // Update button text on mount
+                const btn = document.getElementById('themeToggleBtn');
+                if (btn) {
+                    btn.textContent = darkMode ? '☀️ Light Mode' : '🌙 Dark Mode';
+                }
+                fetchDashboard();
+            }, []);
+
+            React.useEffect(() => {
+                // Render projects in the workspace drawer
+                if (dashboardData?.teams && document.getElementById('projectsList')) {
+                    renderProjectsInDrawer();
+                }
+            }, [dashboardData, currentTeam, teamMembers]);
+
+            // Close dropdown when clicking outside
+            React.useEffect(() => {
+                const handleOutsideClick = (e) => {
+                    if (!e.target.closest('.task-item') && !e.target.closest('.task-dropdown-menu')) {
+                        setOpenTaskDropdown(null);
+                    }
+                };
+
+                document.addEventListener('click', handleOutsideClick);
+                return () => document.removeEventListener('click', handleOutsideClick);
+            }, []);
+
+            // Update dark mode class on wrapper
+            React.useEffect(() => {
+                const wrapper = document.querySelector('.dashboard-wrapper');
+                if (wrapper) {
+                    if (darkMode) {
+                        wrapper.classList.add('dark-mode');
+                    } else {
+                        wrapper.classList.remove('dark-mode');
+                    }
+                }
+                // Update button text
+                const btn = document.getElementById('themeToggleBtn');
+                if (btn) {
+                    btn.textContent = darkMode ? '☀️ Light Mode' : '🌙 Dark Mode';
+                }
+            }, [darkMode]);
+
+            const handleThemeToggle = () => {
+                const newDarkMode = !darkMode;
+                setDarkMode(newDarkMode);
+                localStorage.setItem('darkMode', newDarkMode);
+            };
+
+            const renderProjectsInDrawer = () => {
+                const projectsListContainer = document.getElementById('projectsList');
+                if (!projectsListContainer) return;
+
+                projectsListContainer.innerHTML = '';
+                const projects = [];
+                const projectKeys = new Set();
+
+                (dashboardData?.teams || []).forEach(team => {
+                    const projectKey = team.project_id || team.project_name || team.id;
+                    if (!projectKeys.has(projectKey)) {
+                        projectKeys.add(projectKey);
+                        projects.push({
+                            projectKey,
+                            name: team.project_name || 'Untitled project',
+                            teams: [team]
+                        });
+                    } else {
+                        projects.find(project => project.projectKey === projectKey).teams.push(team);
+                    }
+                });
+
+                if (projects.length === 0) {
+                    projectsListContainer.innerHTML = '<p style="color: #8993a4; font-size: 13px;">No projects assigned yet.</p>';
+                    return;
+                }
+
+                projects.forEach(project => {
+                    const projectCard = document.createElement('button');
+                    const isActive = project.teams.some(team => currentTeam?.id === team.id);
+                    projectCard.className = `project-card ${isActive ? 'active' : ''}`;
+                    projectCard.type = 'button';
+                    projectCard.innerHTML = `
+                        <div class="project-card-name">📁 ${project.name}</div>
+                        <div class="project-card-info">${project.teams.length} team${project.teams.length === 1 ? '' : 's'} assigned</div>
+                    `;
+                    projectCard.onclick = () => {
+                        selectTeam(project.teams[0]);
+                        closeWorkspaceDrawer();
+                    };
+                    projectsListContainer.appendChild(projectCard);
+                });
+            };
+
+            const fetchDashboard = async () => {
+                console.log('📍 fetchDashboard() started');
+                setLoading(true);
+                setError('');
+                
+                try {
+                    const userStr = localStorage.getItem('user');
+                    console.log('📍 User from localStorage:', userStr);
+                    
+                    if (!userStr) {
+                        throw new Error('No user in localStorage');
+                    }
+                    
+                    const user = JSON.parse(userStr);
+                    console.log('📍 Parsed user:', user);
+
+                    const response = await fetch(`/api/teamhead/${user.email}/dashboard`);
+                    console.log('📍 API response status:', response.status);
+                    
+                    if (!response.ok) {
+                        throw new Error('API returned ' + response.status);
+                    }
+                    
+                    const data = await response.json();
+                    console.log('📍 Dashboard data:', data);
+                    
+                    setDashboardData(data);
+                    if (data?.teams?.length > 0) {
+                        console.log('📍 Selecting first team');
+                        selectTeam(data.teams[0]);
+                    }
+                } catch (err) {
+                    console.error('❌ fetchDashboard error:', err);
+                    setError('Error: ' + err.message);
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            const selectTeam = async (team) => {
+                console.log('📍 selectTeam:', team?.team_name);
+                setCurrentTeam(team);
+                setTeamTasks([]);
+                setSelectedDeveloper(null);
+                setDeveloperTasks([]);
+                try {
+                    const response = await fetch(`/api/teams/${team.id}/members`);
+                    if (!response.ok) throw new Error('Team members API error');
+                    
+                    const members = await response.json();
+                    console.log('📍 Team members:', members);
+                    setTeamMembers(members || []);
+
+                    // Fetch team tasks
+                    const tasksResponse = await fetch(`/api/teams/${team.id}/tasks`);
+                    if (tasksResponse.ok) {
+                        const tasks = await tasksResponse.json();
+                        console.log('📍 Team tasks:', tasks);
+                        setTeamTasks(tasks || []);
+                    }
+                } catch (err) {
+                    console.error('❌ selectTeam error:', err);
+                    setTeamMembers([]);
+                    setTeamTasks([]);
+                }
+            };
+
+            const handleSelectDeveloper = async (developer) => {
+                console.log('📍 handleSelectDeveloper:', developer?.name || developer?.developer_name);
+                
+                // If clicking on already selected developer, deselect and fold back
+                if (selectedDeveloper?.id === developer.id) {
+                    console.log('📍 Deselecting developer');
+                    setSelectedDeveloper(null);
+                    setDeveloperTasks([]);
+                    return;
+                }
+                
+                setSelectedDeveloper(developer);
+                setTasksLoading(true);
+                try {
+                    const response = await fetch(
+                        `/api/teams/${currentTeam.id}/tasks/developer/${developer.id}`
+                    );
+                    if (!response.ok) throw new Error('Failed to fetch developer tasks');
+                    const tasks = await response.json();
+                    console.log('📍 Developer tasks:', tasks);
+                    setDeveloperTasks(tasks || []);
+                } catch (err) {
+                    console.error('❌ Error fetching developer tasks:', err);
+                    setDeveloperTasks([]);
+                } finally {
+                    setTasksLoading(false);
+                }
+            };
+
+            const handleEditTask = (task) => {
+                console.log('📍 Edit task:', task);
+                setEditingTaskId(task.id);
+                setEditTaskData({
+                    task_name: task.task_name,
+                    complexity: task.complexity,
+                    status: task.status,
+                    description: task.description || ''
+                });
+                setOpenTaskDropdown(null);
+            };
+
+            const handleDeleteTask = async (taskId, taskName) => {
+                if (window.confirm(`Are you sure you want to delete task "${taskName}"?`)) {
+                    setDeletingTaskId(taskId);
+                    try {
+                        const response = await fetch(`/api/tasks/${taskId}`, {
+                            method: 'DELETE',
+                            headers: { 'Content-Type': 'application/json' }
+                        });
+
+                        const data = await response.json();
+
+                        if (response.ok) {
+                            alert('✅ Task deleted successfully!');
+                            setTeamTasks(teamTasks.filter(t => t.id !== taskId));
+                            setOpenTaskDropdown(null);
+                        } else {
+                            alert('❌ ' + (data.error || 'Failed to delete task'));
+                        }
+                    } catch (err) {
+                        alert('❌ Error deleting task: ' + err.message);
+                    } finally {
+                        setDeletingTaskId(null);
+                    }
+                }
+            };
+
+            const handleCancelEditTask = () => {
+                setEditingTaskId(null);
+                setEditTaskData(null);
+            };
+
+            const handleUpdateTask = async () => {
+                if (!editTaskData.task_name.trim()) {
+                    alert('❌ Task name is required');
+                    return;
+                }
+
+                try {
+                    const response = await fetch(`/api/tasks/${editingTaskId}`, {
+                        method: 'PUT',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            task_name: editTaskData.task_name,
+                            complexity: editTaskData.complexity,
+                            status: editTaskData.status,
+                            description: editTaskData.description
+                        })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        alert('✅ Task updated successfully!');
+                        setTeamTasks(teamTasks.map(t => 
+                            t.id === editingTaskId 
+                                ? {
+                                    ...t,
+                                    ...editTaskData,
+                                    github_verified: data.github_check && data.github_check.uploaded ? 1 : t.github_verified,
+                                    github_check_summary: data.github_check ? data.github_check.reason : t.github_check_summary
+                                }
+                                : t
+                        ));
+                        handleCancelEditTask();
+                    } else {
+                        alert('❌ ' + (data.error || 'Failed to update task'));
+                    }
+                } catch (err) {
+                    alert('❌ Error updating task: ' + err.message);
+                }
+            };
+
+            const handleDivideProject = () => {
+                if (!currentTeam) {
+                    alert('Please select a team first');
+                    return;
+                }
+                localStorage.setItem('currentTeam', JSON.stringify(currentTeam));
+                window.location.href = 'task-division.html';
+            };
+
+            // Loading state
+            if (loading) {
+                return <div className="loading-spinner">⏳ Loading dashboard...</div>;
+            }
+
+            // Error state
+            if (error) {
+                return <div className="error-box">❌ {error}</div>;
+            }
+
+            // No data state
+            if (!dashboardData) {
+                return <div className="error-box">⚠️ No dashboard data loaded</div>;
+            }
+
+            // Main render
+            return (
+                <>
+                    {/* Main Content */}
+                    {currentTeam ? (
+                        <div>
+                            {/* Project Information Section */}
+                            <div className="project-header">
+                                <h1 className="project-name">📁 {currentTeam.project_name}</h1>
+                                {currentTeam.project_description && (
+                                    <p className="project-description">{currentTeam.project_description}</p>
+                                )}
+                            </div>
+
+                            {/* Team Members Section */}
+                            {teamMembers.length > 0 && (
+                                <div className="team-members-section">
+                                    <div className="members-title">👥 Team Members</div>
+                                    <div className="members-list">
+                                        {teamMembers.map(member => (
+                                            <button
+                                                key={member.id}
+                                                className={`member-badge ${selectedDeveloper?.id === member.id ? 'active' : ''}`}
+                                                onClick={() => handleSelectDeveloper(member)}
+                                                type="button"
+                                                style={{
+                                                    background: selectedDeveloper?.id === member.id 
+                                                        ? 'linear-gradient(135deg, #5a67d8 0%, #4c51bf 100%)'
+                                                        : 'linear-gradient(135deg, #667eea 0%, #5a67d8 100%)',
+                                                    cursor: 'pointer',
+                                                    border: 'none'
+                                                }}
+                                            >
+                                                <div style={{display: 'flex', flexDirection: 'column', alignItems: 'center', gap: '4px'}}>
+                                                    <span>{member.name || member.developer_name || 'Developer'}</span>
+                                                    <span style={{
+                                                        padding: '3px 8px',
+                                                        borderRadius: '999px',
+                                                        fontSize: '11px',
+                                                        fontWeight: 700,
+                                                        background: member.overloaded ? '#fde2e2' : 'rgba(255, 255, 255, 0.2)',
+                                                        color: member.overloaded ? '#c0392b' : '#ffffff',
+                                                        border: member.overloaded ? '1px solid #f5b7b1' : '1px solid rgba(255, 255, 255, 0.25)'
+                                                    }}>
+                                                        {member.overloaded ? `Overloaded ${member.load}/${member.capacity}` : `Available ${member.remaining_capacity} left`}
+                                                    </span>
+                                                </div>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+                            )}
+
+                            {/* Developer Tasks Section - Appears directly after developer selection */}
+                            {selectedDeveloper && (
+                                <div className="divide-tasks-section" style={{marginTop: '15px', marginBottom: '15px'}}>
+                                    <div className="divide-tasks-header">
+                                        <div className="divide-tasks-title">
+                                            📋 Tasks for {selectedDeveloper.name || selectedDeveloper.developer_name}
+                                        </div>
+                                    </div>
+
+                                    {tasksLoading ? (
+                                        <div style={{textAlign: 'center', padding: '20px', color: '#7f8c8d'}}>
+                                            ⏳ Loading tasks...
+                                        </div>
+                                    ) : developerTasks.length > 0 ? (
+                                        <div style={{display: 'flex', flexDirection: 'column', gap: '8px'}}>
+                                            {developerTasks.map(task => (
+                                                <div key={task.id} className="task-item">
+                                                    <div className="task-item-name">{task.task_name}</div>
+                                                    <div className="task-item-meta">
+                                                        <span className={`task-badge complexity-${task.complexity}`}>
+                                                            {task.complexity.charAt(0).toUpperCase() + task.complexity.slice(1)}
+                                                        </span>
+                                                        <span className={`task-badge status-${task.status}`}>
+                                                            {task.status.charAt(0).toUpperCase() + task.status.slice(1).replace('_', ' ')}
+                                                        </span>
+                                                        {Number(task.github_verified) === 1 ? (
+                                                            <span className="task-badge" style={{background: '#e8f8f0', color: '#1e8449'}}>
+                                                                🤖 GitHub verified
+                                                            </span>
+                                                        ) : task.status === 'completed' || task.status === 'in_progress' ? (
+                                                            <span className="task-badge" style={{background: '#fdecea', color: '#c0392b'}}>
+                                                                🤖 GitHub pending
+                                                            </span>
+                                                        ) : null}
+                                                        {task.created_at && (
+                                                            <span style={{fontSize: '11px', color: '#7f8c8d'}}>
+                                                                📅 {new Date(task.created_at).toLocaleDateString()}
+                                                            </span>
+                                                        )}
+                                                    </div>
+                                                    {task.description && (
+                                                        <div style={{
+                                                            marginTop: '6px',
+                                                            padding: '6px 10px',
+                                                            background: '#f8f9fa',
+                                                            borderRadius: '4px',
+                                                            fontSize: '12px',
+                                                            color: '#34495e',
+                                                            borderLeft: '3px solid #667eea'
+                                                        }}>
+                                                            📝 {task.description}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+                                        </div>
+                                    ) : (
+                                        <div className="empty-state">
+                                            <div className="empty-state-icon">✅</div>
+                                            <div className="empty-state-text">No tasks assigned to this developer</div>
+                                        </div>
+                                    )}
+                                </div>
+                            )}
+
+                            {/* Divide Project into Tasks Section */}
+                            <div className="divide-tasks-section">
+                                <div className="divide-tasks-header">
+                                    <div className="divide-tasks-title">
+                                        ✂️ Divide Project into Tasks
+                                    </div>
+                                    <button 
+                                        className="divide-btn"
+                                        onClick={handleDivideProject}
+                                        type="button"
+                                    >
+                                        ➕ Add Task
+                                    </button>
+                                </div>
+
+                                <div className="tasks-container">
+                                    {/* Existing Tasks */}
+                                    <div className="tasks-subsection">
+                                        <div className="tasks-subsection-title">
+                                            📋 Existing Tasks ({teamTasks.length})
+                                        </div>
+                                        {teamTasks.length > 0 ? (
+                                            <div className="existing-tasks-list">
+                                                {teamTasks.map(task => (
+                                                    <div 
+                                                        key={task.id} 
+                                                        className="task-item" 
+                                                        style={{position: 'relative'}}
+                                                        onClick={(e) => {
+                                                            e.stopPropagation();
+                                                            setOpenTaskDropdown(openTaskDropdown === task.id ? null : task.id);
+                                                        }}
+                                                    >
+                                                        <div className="task-item-name">{task.task_name}</div>
+                                                        <div className="task-item-meta">
+                                                            {task.assigned_to_name && (
+                                                                <span style={{fontSize: '12px', color: '#667eea', fontWeight: '600'}}>
+                                                                    👤 {task.assigned_to_name}
+                                                                </span>
+                                                            )}
+                                                            <span className={`task-badge complexity-${task.complexity}`}>
+                                                                {task.complexity.charAt(0).toUpperCase() + task.complexity.slice(1)}
+                                                            </span>
+                                                            <span className={`task-badge status-${task.status}`}>
+                                                                {task.status.charAt(0).toUpperCase() + task.status.slice(1).replace('_', ' ')}
+                                                            </span>
+                                                            {Number(task.github_verified) === 1 && (
+                                                                <span className="task-badge" style={{background: '#e8f8f0', color: '#1e8449'}}>
+                                                                    🤖 GitHub verified
+                                                                </span>
+                                                            )}
+                                                        </div>
+                                                        {openTaskDropdown === task.id && (
+                                                            <div className="task-dropdown-menu" onClick={(e) => e.stopPropagation()}>
+                                                                <button 
+                                                                    className="task-dropdown-item task-dropdown-edit"
+                                                                    onClick={() => handleEditTask(task)}
+                                                                >
+                                                                    ✏️ Edit
+                                                                </button>
+                                                                <button 
+                                                                    className="task-dropdown-item task-dropdown-delete"
+                                                                    onClick={() => handleDeleteTask(task.id, task.task_name)}
+                                                                    disabled={deletingTaskId === task.id}
+                                                                >
+                                                                    {deletingTaskId === task.id ? '⏳ Deleting...' : '🗑️ Delete'}
+                                                                </button>
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        ) : (
+                                            <div className="empty-state">
+                                                <div className="empty-state-icon">📭</div>
+                                                <div className="empty-state-text">No tasks created yet</div>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    {/* Create New Tasks */}
+                                    <div className="tasks-subsection">
+                                        <div className="tasks-subsection-title">
+                                            ➕ Create New Tasks
+                                        </div>
+                                        <div className="empty-state">
+                                            <div className="empty-state-icon">🆕</div>
+                                            <div className="empty-state-text">Click 'Add Task' to create one</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div style={{textAlign: 'center', padding: '60px 40px', color: '#95a5a6'}}>
+                            <p style={{fontSize: '16px', fontWeight: '500'}}>Select a team from the left to view details</p>
+                        </div>
+                    )}
+
+                    {/* Edit Task Modal */}
+                    {editingTaskId && editTaskData && (
+                        <div style={{
+                            position: 'fixed',
+                            top: 0,
+                            left: 0,
+                            right: 0,
+                            bottom: 0,
+                            background: 'rgba(0, 0, 0, 0.5)',
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            zIndex: 2000
+                        }} onClick={handleCancelEditTask}>
+                            <div style={{
+                                background: darkMode ? '#2a2a3e' : 'white',
+                                padding: '30px',
+                                borderRadius: '12px',
+                                boxShadow: '0 10px 40px rgba(0, 0, 0, 0.3)',
+                                maxWidth: '500px',
+                                width: '90%',
+                                border: darkMode ? '1px solid #404050' : 'none'
+                            }} onClick={(e) => e.stopPropagation()}>
+                                <h2 style={{marginBottom: '20px', color: darkMode ? '#e0e0e0' : '#2c3e50'}}>Edit Task</h2>
+                                
+                                <div style={{marginBottom: '15px'}}>
+                                    <label style={{display: 'block', marginBottom: '5px', fontWeight: '600', color: darkMode ? '#e0e0e0' : '#2c3e50'}}>Task Name</label>
+                                    <input 
+                                        type="text"
+                                        value={editTaskData.task_name}
+                                        onChange={(e) => setEditTaskData({...editTaskData, task_name: e.target.value})}
+                                        style={{
+                                            width: '100%',
+                                            padding: '10px',
+                                            border: darkMode ? '1px solid #404050' : '1px solid #bdc3c7',
+                                            borderRadius: '6px',
+                                            fontSize: '14px',
+                                            background: darkMode ? '#1e1e2e' : 'white',
+                                            color: darkMode ? '#e0e0e0' : '#2c3e50'
+                                        }}
+                                    />
+                                </div>
+
+                                <div style={{marginBottom: '15px'}}>
+                                    <label style={{display: 'block', marginBottom: '5px', fontWeight: '600', color: darkMode ? '#e0e0e0' : '#2c3e50'}}>Complexity</label>
+                                    <select
+                                        value={editTaskData.complexity}
+                                        onChange={(e) => setEditTaskData({...editTaskData, complexity: e.target.value})}
+                                        style={{
+                                            width: '100%',
+                                            padding: '10px',
+                                            border: darkMode ? '1px solid #404050' : '1px solid #bdc3c7',
+                                            borderRadius: '6px',
+                                            fontSize: '14px',
+                                            background: darkMode ? '#1e1e2e' : 'white',
+                                            color: darkMode ? '#e0e0e0' : '#2c3e50'
+                                        }}
+                                    >
+                                        <option value="low">Low</option>
+                                        <option value="medium">Medium</option>
+                                        <option value="high">High</option>
+                                    </select>
+                                </div>
+
+                                <div style={{marginBottom: '15px'}}>
+                                    <label style={{display: 'block', marginBottom: '5px', fontWeight: '600', color: darkMode ? '#e0e0e0' : '#2c3e50'}}>Status</label>
+                                    <select
+                                        value={editTaskData.status}
+                                        onChange={(e) => setEditTaskData({...editTaskData, status: e.target.value})}
+                                        style={{
+                                            width: '100%',
+                                            padding: '10px',
+                                            border: darkMode ? '1px solid #404050' : '1px solid #bdc3c7',
+                                            borderRadius: '6px',
+                                            fontSize: '14px',
+                                            background: darkMode ? '#1e1e2e' : 'white',
+                                            color: darkMode ? '#e0e0e0' : '#2c3e50'
+                                        }}
+                                    >
+                                        <option value="pending">Pending</option>
+                                        <option value="in_progress">In Progress</option>
+                                        <option value="completed">Completed</option>
+                                    </select>
+                                </div>
+
+                                <div style={{marginBottom: '20px'}}>
+                                    <label style={{display: 'block', marginBottom: '5px', fontWeight: '600', color: darkMode ? '#e0e0e0' : '#2c3e50'}}>Description</label>
+                                    <textarea
+                                        value={editTaskData.description}
+                                        onChange={(e) => setEditTaskData({...editTaskData, description: e.target.value})}
+                                        style={{
+                                            width: '100%',
+                                            padding: '10px',
+                                            border: darkMode ? '1px solid #404050' : '1px solid #bdc3c7',
+                                            borderRadius: '6px',
+                                            fontSize: '14px',
+                                            minHeight: '100px',
+                                            fontFamily: 'inherit',
+                                            background: darkMode ? '#1e1e2e' : 'white',
+                                            color: darkMode ? '#e0e0e0' : '#2c3e50'
+                                        }}
+                                    />
+                                </div>
+
+                                <div style={{display: 'flex', gap: '10px'}}>
+                                    <button
+                                        onClick={handleUpdateTask}
+                                        style={{
+                                            flex: 1,
+                                            padding: '12px',
+                                            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                                            color: 'white',
+                                            border: 'none',
+                                            borderRadius: '6px',
+                                            fontWeight: '600',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        💾 Save Changes
+                                    </button>
+                                    <button
+                                        onClick={handleCancelEditTask}
+                                        style={{
+                                            flex: 1,
+                                            padding: '12px',
+                                            background: darkMode ? '#404050' : '#f0f2f5',
+                                            color: darkMode ? '#e0e0e0' : '#2c3e50',
+                                            border: darkMode ? '1px solid #505060' : 'none',
+                                            borderRadius: '6px',
+                                            fontWeight: '600',
+                                            cursor: 'pointer'
+                                        }}
+                                    >
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </>
+            );
+        }
+
+        // ============================================
+        // Render Application
+        // ============================================
+        let darkModeState = localStorage.getItem('darkMode') === 'true';
+        
+        window.ReactApp = {
+            setDarkModeRef: function(setter) {
+                this.setDarkMode = setter;
+            },
+            toggleTheme: function() {
+                darkModeState = !darkModeState;
+                localStorage.setItem('darkMode', darkModeState);
+                if (this.setDarkMode) {
+                    this.setDarkMode(darkModeState);
+                }
+                const btn = document.getElementById('themeToggleBtn');
+                if (btn) {
+                    btn.textContent = darkModeState ? '☀️ Light Mode' : '🌙 Dark Mode';
+                }
+            },
+            render: function() {
+                console.log('🎨 Rendering TeamHeadDashboard component');
+                const root = ReactDOM.createRoot(document.getElementById('root'));
+                root.render(<TeamHeadDashboard />);
+            }
+        };
+    </script>
+
+    <!-- Initialization -->
+    <script>
+        window.addEventListener('DOMContentLoaded', async () => {
+            console.log('\n================================');
+            console.log('🚀 TEAM HEAD PAGE LOADED');
+            console.log('================================\n');
+            
+            try {
+                // Check user
+                const user = localStorage.getItem('user');
+                if (!user) {
+                    console.warn('❌ No user in localStorage, redirecting to login');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                const userData = JSON.parse(user);
+                if (userData.role !== 'team_head') {
+                    console.warn('❌ User is not team_head, redirecting');
+                    window.location.href = 'login.html';
+                    return;
+                }
+                
+                console.log('✅ User check passed:', userData.email);
+                
+                // Wait for React to be ready
+                console.log('⏳ Waiting for React libraries...');
+                await window.ReactReady;
+                
+                console.log('✅ React libraries ready, rendering application');
+                window.ReactApp.render();
+                
+            } catch (err) {
+                console.error('❌ FATAL ERROR:', err);
+                const root = document.getElementById('root');
+                if (root) {
+                    root.innerHTML = `
+                        <div style="color: #721c24; padding: 30px; background: #f8d7da; border-radius: 8px; border: 1px solid #f5b7b1; margin: 20px;">
+                            <h2>❌ Error Loading Dashboard</h2>
+                            <p><strong>${err.message}</strong></p>
+                            <p style="font-size: 12px; margin-top: 10px;">Check F12 console for details</p>
+                            <p style="margin-top: 15px;">
+                                <a href="login.html" style="color: #004085; text-decoration: underline;  font-weight: bold;">← Back to Login</a>
+                            </p>
+                        </div>
+                    `;
+                }
+            }
+        });
+
+        // Logout handler
+        function logout() {
+            console.log('📍 Logout clicked');
+            localStorage.removeItem('user');
+            // NOTE: We intentionally do NOT remove 'teamheadProfile' 
+            // so that profile picture persists across logout/login
+            window.location.href = 'login.html';
+        }
+
+        // Workspace drawer functions
+        function openWorkspaceDrawer() {
+            const drawer = document.getElementById('workspaceDrawer');
+            const overlay = document.getElementById('workspaceOverlay');
+            if (drawer && overlay) {
+                drawer.style.display = 'block';
+                overlay.style.display = 'block';
+            }
+            setProfileSettingsVisibility(false);
+            loadProfileData();
+        }
+
+        function closeWorkspaceDrawer() {
+            const drawer = document.getElementById('workspaceDrawer');
+            const overlay = document.getElementById('workspaceOverlay');
+            if (drawer && overlay) {
+                drawer.style.display = 'none';
+                overlay.style.display = 'none';
+            }
+        }
+
+        function setProfileSettingsVisibility(isVisible) {
+            const panel = document.getElementById('profileSettingsPanel');
+            const button = document.getElementById('profileSettingsBtn');
+            if (!panel || !button) return;
+
+            panel.style.display = isVisible ? 'block' : 'none';
+            button.setAttribute('aria-expanded', String(isVisible));
+        }
+
+        function toggleProfileSettings() {
+            const panel = document.getElementById('profileSettingsPanel');
+            if (!panel) return;
+
+            setProfileSettingsVisibility(panel.style.display === 'none');
+        }
+
+        function loadProfileData() {
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                const userData = JSON.parse(userStr);
+                const savedProfile = localStorage.getItem('teamheadProfile');
+                const profileData = savedProfile ? JSON.parse(savedProfile) : {};
+                
+                // Use profileData name if available, otherwise fall back to userData
+                const displayName = profileData.name || userData.name || 'Team Head';
+                const displayPicture = profileData.profilePicture || userData.profilePicture || '';
+
+                document.getElementById('profileName').textContent = displayName;
+                document.getElementById('profileEmail').textContent = userData.email || 'team.head@devsynx.com';
+                document.getElementById('profileNameInput').value = displayName;
+                const navUserName = document.getElementById('navUserName');
+                if (navUserName) navUserName.textContent = displayName;
+
+                if (displayPicture && displayPicture.startsWith('data:')) {
+                    const img = document.getElementById('profileImg');
+                    img.src = displayPicture;
+                    img.style.display = 'block';
+                    document.getElementById('profileEmoji').style.display = 'none';
+                } else {
+                    document.getElementById('profileImg').style.display = 'none';
+                    document.getElementById('profileEmoji').style.display = 'flex';
+                }
+            }
+        }
+
+        function handleProfilePictureChange(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onloadend = () => {
+                    const img = document.getElementById('profileImg');
+                    img.src = reader.result;
+                    img.style.display = 'block';
+                    document.getElementById('profileEmoji').style.display = 'none';
+                    
+                    // Save to both user and profile data immediately
+                    const userStr = localStorage.getItem('user');
+                    if (userStr) {
+                        const userData = JSON.parse(userStr);
+                        const profileName = document.getElementById('profileNameInput').value || userData.name || 'Team Head';
+                        
+                        const profileData = {
+                            name: profileName,
+                            profilePicture: reader.result,
+                            updatedAt: new Date().toISOString()
+                        };
+                        
+                        // Update user object with new picture
+                        const updatedUser = {
+                            ...userData,
+                            name: profileName,
+                            profilePicture: reader.result
+                        };
+                        
+                        localStorage.setItem('user', JSON.stringify(updatedUser));
+                        localStorage.setItem('teamheadProfile', JSON.stringify(profileData));
+                    }
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function handleSaveProfile() {
+            const userStr = localStorage.getItem('user');
+            if (userStr) {
+                const userData = JSON.parse(userStr);
+                const profileName = document.getElementById('profileNameInput').value || 'Team Head';
+                const profileImg = document.getElementById('profileImg');
+                const profilePicture = profileImg.src;
+
+                const profileData = {
+                    name: profileName,
+                    profilePicture: profilePicture && profilePicture.startsWith('data:') ? profilePicture : '',
+                    updatedAt: new Date().toISOString()
+                };
+
+                // Save to both user and teamheadProfile for persistence
+                const updatedUser = {
+                    ...userData,
+                    name: profileName,
+                    profilePicture: profileData.profilePicture
+                };
+                localStorage.setItem('user', JSON.stringify(updatedUser));
+                localStorage.setItem('teamheadProfile', JSON.stringify(profileData));
+                
+                // Update displayed name
+                document.getElementById('profileName').textContent = profileName;
+                const navUserName = document.getElementById('navUserName');
+                if (navUserName) navUserName.textContent = profileName;
+
+                alert('✅ Profile updated successfully!');
+            }
+        }
+
+        // Initialize profile on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            loadProfileData();
+        });
+    </script>
+</body>
+</html>

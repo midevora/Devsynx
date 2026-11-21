@@ -1,0 +1,1629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DevSynx - Redirecting...</title>
+    <meta http-equiv="refresh" content="0; url=login.html">
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0;
+        }
+        .container {
+            text-align: center;
+            color: white;
+        }
+        h1 {
+            font-size: 32px;
+            margin-bottom: 20px;
+        }
+        p {
+            font-size: 18px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🚀 DevSynx</h1>
+        <p>Redirecting to login page...</p>
+    </div>
+</body>
+</html>
+
+        .ds-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .ds-form-card {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 450px;
+        }
+
+        .ds-dashboard {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            min-height: 100vh;
+        }
+
+        .ds-navbar {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 40px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .logout-btn {
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+            border: 2px solid white;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+        }
+
+        .logout-btn:hover {
+            background: white;
+            color: #667eea;
+        }
+
+        .ds-header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+
+        .ds-header h2 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 24px;
+        }
+
+        .highlight {
+            color: #3498db;
+        }
+
+        .ds-header p {
+            color: #7f8c8d;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        label {
+            display: block;
+            color: #2c3e50;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        input, select, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+        }
+
+        input:focus, select:focus, textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+
+        .ds-btn, .toggle-btn {
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            flex: 1;
+        }
+
+        .ds-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .ds-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .toggle-btn {
+            background: #ecf0f1;
+            color: #2c3e50;
+            border: 2px solid #bdc3c7;
+            flex: initial;
+            padding: 10px 15px;
+        }
+
+        .toggle-btn.active {
+            background: #3498db;
+            color: white;
+            border-color: #3498db;
+        }
+
+        .secondary-btn {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #3498db;
+            background: white;
+            color: #3498db;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 15px;
+        }
+
+        .secondary-btn:hover {
+            background: #3498db;
+            color: white;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .alert-error {
+            background-color: #fadbd8;
+            color: #c0392b;
+            border: 1px solid #f5b7b1;
+        }
+
+        .alert-success {
+            background-color: #d5f4e6;
+            color: #27ae60;
+            border: 1px solid #a9dfbf;
+        }
+
+        .dashboard-content {
+            padding: 40px;
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .dashboard-card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border-left: 4px solid #3498db;
+        }
+
+        .dashboard-card h3 {
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        .dashboard-card p {
+            color: #7f8c8d;
+            font-size: 14px;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        /* Dark Mode Styles */
+        .dark-mode {
+            background-color: #121212;
+        }
+
+        .dark-mode body {
+            background: linear-gradient(135deg, #1e1e2e 0%, #16213e 100%);
+        }
+
+        .dark-mode .ds-container {
+            background-color: rgba(18, 18, 18, 0.95);
+        }
+
+        .dark-mode .ds-form-card {
+            background: #2a2a3e;
+            color: #e0e0e0;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7);
+        }
+
+        .dark-mode .ds-dashboard {
+            background: #1a1a2e;
+            color: #e0e0e0;
+        }
+
+        .dark-mode .dashboard-content {
+            background: #1a1a2e;
+            color: #e0e0e0;
+        }
+
+        .dark-mode .ds-header h2 {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .ds-header p {
+            color: #b0b0b0;
+        }
+
+        .dark-mode .highlight {
+            color: #64b5f6;
+        }
+
+        .dark-mode label {
+            color: #e0e0e0;
+        }
+
+        .dark-mode input,
+        .dark-mode select,
+        .dark-mode textarea {
+            background-color: #2a2a3e;
+            color: #e0e0e0;
+            border-color: #404050;
+        }
+
+        .dark-mode input:focus,
+        .dark-mode select:focus,
+        .dark-mode textarea:focus {
+            border-color: #667eea;
+            background-color: #2a2a3e;
+            box-shadow: 0 0 8px rgba(102, 126, 234, 0.5);
+        }
+
+        .dark-mode .toggle-btn {
+            background: #2a2a3e;
+            color: #e0e0e0;
+            border-color: #404050;
+        }
+
+        .dark-mode .toggle-btn.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+
+        .dark-mode .toggle-btn:hover {
+            background: #333349;
+            border-color: #667eea;
+        }
+
+        .dark-mode .secondary-btn {
+            background: transparent;
+            color: #667eea;
+            border-color: #667eea;
+        }
+
+        .dark-mode .secondary-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .dark-mode .dashboard-card {
+            background: #2a2a3e;
+            color: #e0e0e0;
+            border-left-color: #667eea;
+        }
+
+        .dark-mode .dashboard-card h3 {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .dashboard-card p {
+            color: #b0b0b0;
+        }
+
+        .dark-mode .alert {
+            background-color: #2a2a3e;
+            color: #e0e0e0;
+        }
+
+        .dark-mode .alert-error {
+            background-color: rgba(192, 57, 43, 0.3);
+            color: #ff9999;
+            border-color: rgba(192, 57, 43, 0.5);
+        }
+
+        .dark-mode .alert-success {
+            background-color: rgba(39, 174, 96, 0.3);
+            color: #99ff99;
+            border-color: rgba(39, 174, 96, 0.5);
+        }
+
+        .dark-mode .ds-navbar {
+            background: linear-gradient(135deg, #1e1e2e 0%, #16213e 100%);
+            border-bottom: 1px solid #404050;
+        }
+
+        .dark-mode h1, .dark-mode h2 {
+            color: #e0e0e0;
+        }
+
+        .dark-mode p {
+            color: #b0b0b0;
+        }
+
+        .theme-toggle-btn {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #3498db;
+            background: white;
+            color: #3498db;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-bottom: 15px;
+        }
+
+        .theme-toggle-btn:hover {
+            background: #3498db;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .dark-mode .theme-toggle-btn {
+            background: #2a2a3e;
+            color: #667eea;
+            border-color: #667eea;
+        }
+
+        .dark-mode .theme-toggle-btn:hover {
+            background: #667eea;
+            color: #2a2a3e;
+        }
+
+        /* Additional Dark Mode Styles for Widgets */
+        .dark-mode .checkbox-group {
+            background-color: #1a1a2e;
+            border-color: #404050;
+        }
+
+        .dark-mode .checkbox-label {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .checkbox-label input[type="checkbox"] {
+            accent-color: #667eea;
+        }
+
+        .dark-mode .ds-form-card h3 {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .dashboard-content p {
+            color: #b0b0b0;
+        }
+
+        .dark-mode .dashboard-grid {
+            margin-top: 20px;
+        }
+
+        /* Dark mode for inline scrollable containers */
+        .dark-mode div[style*="border: 1px solid #bdc3c7"] {
+            background-color: #1a1a2e !important;
+            border-color: #404050 !important;
+            color: #e0e0e0 !important;
+        }
+
+        .dark-mode div[style*="border: 1px solid #bdc3c7"] label {
+            color: #e0e0e0 !important;
+        }
+
+        .dark-mode div[style*="maxHeight"] {
+            background-color: #1a1a2e !important;
+            color: #e0e0e0 !important;
+        }
+
+        .dark-mode .input-group label {
+            color: #e0e0e0;
+        }
+
+        .dark-mode .ds-form-card .input-group label {
+            color: #e0e0e0;
+        }
+
+        .dark-mode option {
+            background-color: #2a2a3e;
+            color: #e0e0e0;
+        }
+
+        .dark-mode select option {
+            background-color: #2a2a3e;
+            color: #e0e0e0;
+        }
+
+        .dark-mode .nav-btn {
+            background: transparent;
+            color: #667eea;
+            border-color: #667eea;
+        }
+
+        .dark-mode .nav-btn:hover {
+            background: #667eea;
+            color: white;
+        }
+
+        .dark-mode .ds-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+
+        .dark-mode .ds-btn:hover {
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.5);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+        const App = () => {
+            const [user, setUser] = React.useState(null);
+            const [currentPage, setCurrentPage] = React.useState('login');
+            const [darkMode, setDarkMode] = React.useState(localStorage.getItem('darkMode') === 'true');
+
+            const handleThemeToggle = () => {
+                const newDarkMode = !darkMode;
+                setDarkMode(newDarkMode);
+                localStorage.setItem('darkMode', newDarkMode);
+            };
+
+            React.useEffect(() => {
+                const savedUser = localStorage.getItem('user');
+                if (savedUser) {
+                    setUser(JSON.parse(savedUser));
+                    setCurrentPage('dashboard');
+                }
+            }, []);
+
+            const handleLogout = () => {
+                localStorage.removeItem('user');
+                setUser(null);
+                setCurrentPage('login');
+            };
+
+            const handleLogin = (userData) => {
+                setUser(userData);
+                localStorage.setItem('user', JSON.stringify(userData));
+                setCurrentPage('dashboard');
+            };
+
+            if (!user) {
+                return currentPage === 'login' ? 
+                    <LoginPage setCurrentPage={setCurrentPage} onLogin={handleLogin} darkMode={darkMode} onThemeToggle={handleThemeToggle} /> :
+                    <SignupPage setCurrentPage={setCurrentPage} onSignup={handleLogin} darkMode={darkMode} onThemeToggle={handleThemeToggle} />;
+            }
+
+            const DashboardComponent = 
+                user.role === 'manager' ? ManagerDashboard :
+                user.role === 'developer' ? DeveloperDashboard :
+                user.role === 'team_head' ? TeamHeadDashboard :
+                ClientDashboard;
+
+            return <DashboardComponent user={user} onLogout={handleLogout} darkMode={darkMode} onThemeToggle={handleThemeToggle} />;
+        };
+
+        const LoginPage = ({ setCurrentPage, onLogin, darkMode, onThemeToggle }) => {
+            const [email, setEmail] = React.useState('manager@devsynx.com');
+            const [password, setPassword] = React.useState('manager123');
+            const [error, setError] = React.useState('');
+            const [loading, setLoading] = React.useState(false);
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setError('');
+                setLoading(true);
+
+                try {
+                    const response = await fetch('/api/auth/login', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email, password })
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        onLogin(data.user);
+                    } else {
+                        setError(data.error || 'Login failed');
+                    }
+                } catch (err) {
+                    setError('Cannot connect to server');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <div className={`ds-container ${darkMode ? 'dark-mode' : ''}`}>
+                    <div className="ds-form-card">
+                        <div className="ds-header">
+                            <h2>DevSynx <span className="highlight">Login</span></h2>
+                            <p>Welcome back to the management console</p>
+                        </div>
+
+                        {error && <div className="alert alert-error">{error}</div>}
+
+                        <form onSubmit={handleSubmit}>
+                            <div className="input-group">
+                                <label>Email</label>
+                                <input type="email" placeholder="manager@devsynx.com" required
+                                    value={email}
+                                    onChange={e => setEmail(e.target.value)} />
+                            </div>
+
+                            <div className="input-group">
+                                <label>Password</label>
+                                <input type="password" placeholder="Enter password" required
+                                    value={password}
+                                    onChange={e => setPassword(e.target.value)} />
+                            </div>
+
+                            <button type="submit" className="ds-btn" disabled={loading} style={{width: '100%'}}>
+                                {loading ? 'Logging in...' : 'Login'}
+                            </button>
+                        </form>
+
+                        <button className="secondary-btn" onClick={() => setCurrentPage('signup')}>
+                            Don't have an account? Sign up
+                        </button>
+                        <button className="theme-toggle-btn" onClick={onThemeToggle}>
+                            {darkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        const SignupPage = ({ setCurrentPage, onSignup, darkMode, onThemeToggle }) => {
+            const [formData, setFormData] = React.useState({
+                email: '',
+                password: '',
+                name: '',
+                role: 'developer'
+            });
+            const [error, setError] = React.useState('');
+            const [success, setSuccess] = React.useState('');
+            const [loading, setLoading] = React.useState(false);
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setError('');
+                setSuccess('');
+                setLoading(true);
+
+                try {
+                    const response = await fetch('/api/auth/signup', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        setSuccess(data.message);
+                        setFormData({ email: '', password: '', name: '', role: 'developer' });
+                        setTimeout(() => {
+                            onSignup(data.user);
+                        }, 1500);
+                    } else {
+                        setError(data.error || 'Signup failed');
+                    }
+                } catch (err) {
+                    setError('Cannot connect to server');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <div className={`ds-container ${darkMode ? 'dark-mode' : ''}`}>
+                    <div className="ds-form-card">
+                        <div className="ds-header">
+                            <h2>DevSynx <span className="highlight">Sign Up</span></h2>
+                            <p>Create your account</p>
+                        </div>
+
+                        {error && <div className="alert alert-error">{error}</div>}
+                        {success && <div className="alert alert-success">{success}</div>}
+
+                        <form onSubmit={handleSubmit}>
+                            <div className="input-group">
+                                <label>Full Name</label>
+                                <input type="text" placeholder="John Doe" required
+                                    value={formData.name}
+                                    onChange={e => setFormData({...formData, name: e.target.value})} />
+                            </div>
+
+                            <div className="input-group">
+                                <label>Email</label>
+                                <input type="email" placeholder="your@email.com" required
+                                    value={formData.email}
+                                    onChange={e => setFormData({...formData, email: e.target.value})} />
+                            </div>
+
+                            <div className="input-group">
+                                <label>Password</label>
+                                <input type="password" placeholder="Enter password" required
+                                    value={formData.password}
+                                    onChange={e => setFormData({...formData, password: e.target.value})} />
+                            </div>
+
+                            <div className="input-group">
+                                <label>Role</label>
+                                <select required value={formData.role}
+                                    onChange={e => setFormData({...formData, role: e.target.value})}>
+                                    <option value="developer">Developer</option>
+                                    <option value="team_head">Team Head</option>
+                                    <option value="client">Client</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" className="ds-btn" disabled={loading} style={{width: '100%'}}>
+                                {loading ? 'Creating...' : 'Sign Up'}
+                            </button>
+                        </form>
+
+                        <button className="secondary-btn" onClick={() => setCurrentPage('login')}>
+                            Already have an account? Login
+                        </button>
+                        <button className="theme-toggle-btn" onClick={onThemeToggle}>
+                            {darkMode ? '☀️ Light Mode' : '🌙 Dark Mode'}
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        const ManagerDashboard = ({ user, onLogout, darkMode, onThemeToggle }) => {
+            const [currentSection, setCurrentSection] = React.useState('overview');
+
+            return (
+                <div className={`ds-dashboard ${darkMode ? 'dark-mode' : ''}`}>
+                    <div className="ds-navbar">
+                        <h1>🎯 Manager Dashboard</h1>
+                        <div style={{display: 'flex', gap: '10px'}}>
+                            <button className="logout-btn" onClick={onThemeToggle}>
+                                {darkMode ? '☀️' : '🌙'}
+                            </button>
+                            <button className="logout-btn" onClick={onLogout}>Logout</button>
+                        </div>
+                    </div>
+
+                    <div className="dashboard-content">
+                        <h2>Welcome, {user.name}!</h2>
+                        <p style={{color: '#7f8c8d', marginBottom: '20px'}}>Manage projects, developers, and teams</p>
+
+                        <div style={{display: 'flex', gap: '10px', marginBottom: '20px', flexWrap: 'wrap'}}>
+                            <button className={`toggle-btn ${currentSection === 'overview' ? 'active' : ''}`}
+                                onClick={() => setCurrentSection('overview')}>Overview</button>
+                            <button className={`toggle-btn ${currentSection === 'teams' ? 'active' : ''}`}
+                                onClick={() => setCurrentSection('teams')}>Create Teams</button>
+                            <button className={`toggle-btn ${currentSection === 'projects' ? 'active' : ''}`}
+                                onClick={() => setCurrentSection('projects')}>Create Projects</button>
+                        </div>
+
+                        {currentSection === 'overview' && (
+                            <div className="dashboard-grid">
+                                <div className="dashboard-card">
+                                    <h3>👥 Manage Teams</h3>
+                                    <p>Create and organize development teams with assigned developers and team heads.</p>
+                                </div>
+                                <div className="dashboard-card">
+                                    <h3>📋 Manage Projects</h3>
+                                    <p>Define new projects, set timelines, and assign them to teams.</p>
+                                </div>
+                                <div className="dashboard-card">
+                                    <h3>👨‍💻 Manage Developers</h3>
+                                    <p>View registered developers and their assignments.</p>
+                                </div>
+                            </div>
+                        )}
+
+                        {currentSection === 'teams' && <CreateTeamSection darkMode={darkMode} />}
+                        {currentSection === 'projects' && <CreateProjectSection darkMode={darkMode} />}
+                    </div>
+                </div>
+            );
+        };
+
+        const DeveloperDashboard = ({ user, onLogout, darkMode, onThemeToggle }) => {
+            return (
+                <div className={`ds-dashboard ${darkMode ? 'dark-mode' : ''}`}>
+                    <div className="ds-navbar">
+                        <h1>💻 Developer Dashboard</h1>
+                        <div style={{display: 'flex', gap: '10px'}}>
+                            <button className="logout-btn" onClick={onThemeToggle}>
+                                {darkMode ? '☀️' : '🌙'}
+                            </button>
+                            <button className="logout-btn" onClick={onLogout}>Logout</button>
+                        </div>
+                    </div>
+
+                    <div className="dashboard-content">
+                        <h2>Welcome, {user.name}!</h2>
+                        <p style={{color: '#7f8c8d', marginBottom: '20px'}}>Developer ID: {user.developer_id}</p>
+
+                        <div className="dashboard-grid">
+                            <div className="dashboard-card">
+                                <h3>📚 My Assignments</h3>
+                                <p>View projects and teams you're assigned to.</p>
+                            </div>
+                            <div className="dashboard-card">
+                                <h3>📊 My Progress</h3>
+                                <p>Track your work and contributions to projects.</p>
+                            </div>
+                            <div className="dashboard-card">
+                                <h3>👥 Team Members</h3>
+                                <p>Connect with your team members and collaborators.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const TeamHeadDashboard = ({ user, onLogout, darkMode, onThemeToggle }) => {
+            return (
+                <div className={`ds-dashboard ${darkMode ? 'dark-mode' : ''}`}>
+                    <div className="ds-navbar">
+                        <h1>🔗 Team Head Dashboard</h1>
+                        <div style={{display: 'flex', gap: '10px'}}>
+                            <button className="logout-btn" onClick={onThemeToggle}>
+                                {darkMode ? '☀️' : '🌙'}
+                            </button>
+                            <button className="logout-btn" onClick={onLogout}>Logout</button>
+                        </div>
+                    </div>
+
+                    <div className="dashboard-content">
+                        <h2>Welcome, {user.name}!</h2>
+                        <p style={{color: '#7f8c8d', marginBottom: '20px'}}>Manage your team and projects</p>
+
+                        <div className="dashboard-grid">
+                            <div className="dashboard-card">
+                                <h3>👥 My Team</h3>
+                                <p>View and manage team members under your leadership.</p>
+                            </div>
+                            <div className="dashboard-card">
+                                <h3>📋 Team Projects</h3>
+                                <p>Track projects assigned to your team.</p>
+                            </div>
+                            <div className="dashboard-card">
+                                <h3>📈 Performance</h3>
+                                <p>Monitor team progress and productivity metrics.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const ClientDashboard = ({ user, onLogout, darkMode, onThemeToggle }) => {
+            return (
+                <div className={`ds-dashboard ${darkMode ? 'dark-mode' : ''}`}>
+                    <div className="ds-navbar">
+                        <h1>👤 Client Dashboard</h1>
+                        <div style={{display: 'flex', gap: '10px'}}>
+                            <button className="logout-btn" onClick={onThemeToggle}>
+                                {darkMode ? '☀️' : '🌙'}
+                            </button>
+                            <button className="logout-btn" onClick={onLogout}>Logout</button>
+                        </div>
+                    </div>
+
+                    <div className="dashboard-content">
+                        <h2>Welcome, {user.name}!</h2>
+                        <p style={{color: '#7f8c8d', marginBottom: '20px'}}>Track your project status</p>
+
+                        <div className="dashboard-grid">
+                            <div className="dashboard-card">
+                                <h3>📋 My Projects</h3>
+                                <p>View all projects you have commissioned or are tracking.</p>
+                            </div>
+                            <div className="dashboard-card">
+                                <h3>📞 Support</h3>
+                                <p>Contact project managers and team leads for updates.</p>
+                            </div>
+                            <div className="dashboard-card">
+                                <h3>📊 Reports</h3>
+                                <p>View project reports and deliverables.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const CreateTeamSection = ({ darkMode }) => {
+            const [teamData, setTeamData] = React.useState({
+                team_name: '',
+                project_id: '',
+                team_head_id: '',
+                member_ids: []
+            });
+
+            const [developers, setDevelopers] = React.useState([]);
+            const [projects, setProjects] = React.useState([]);
+            const [loading, setLoading] = React.useState(true);
+
+            React.useEffect(() => {
+                const loadData = async () => {
+                    try {
+                        const [devRes, projRes] = await Promise.all([
+                            fetch('/api/developers'),
+                            fetch('/api/projects')
+                        ]);
+
+                        if (devRes.ok && projRes.ok) {
+                            setDevelopers(await devRes.json());
+                            setProjects(await projRes.json());
+                        }
+                    } catch (err) {
+                        console.log(err);
+                    } finally {
+                        setLoading(false);
+                    }
+                };
+
+                loadData();
+            }, []);
+
+            const handleMemberToggle = (devId) => {
+                const current = teamData.member_ids;
+                const updated = current.includes(devId)
+                    ? current.filter(id => id !== devId)
+                    : [...current, devId];
+                setTeamData({ ...teamData, member_ids: updated });
+            };
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                
+                if (!teamData.team_name || !teamData.project_id || !teamData.team_head_id || teamData.member_ids.length === 0) {
+                    alert('❌ Please fill in all fields');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/create-team', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(teamData)
+                    });
+                    
+                    if (response.ok) {
+                        alert("✅ Team created successfully!");
+                        setTeamData({ team_name: '', project_id: '', team_head_id: '', member_ids: [] });
+                    } else {
+                        const data = await response.json();
+                        alert("❌ Error: " + (data.error || 'Unknown error'));
+                    }
+                } catch (err) {
+                    alert("❌ Error connecting to server");
+                }
+            };
+
+            if (loading) return <p>Loading...</p>;
+
+            return (
+                <div className={`ds-form-card ${darkMode ? 'dark-mode' : ''}`}>
+                    <h3>Create New Team</h3>
+                    <form onSubmit={handleSubmit} style={{marginTop: '20px'}}>
+                        <div className="input-group">
+                            <label>Team Name</label>
+                            <input type="text" placeholder="e.g. Blue Squad" required
+                                value={teamData.team_name}
+                                onChange={e => setTeamData({...teamData, team_name: e.target.value})} />
+                        </div>
+
+                        <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px'}}>
+                            <div className="input-group">
+                                <label>Project</label>
+                                <select required value={teamData.project_id} 
+                                    onChange={e => setTeamData({...teamData, project_id: e.target.value})}>
+                                    <option value="">Select...</option>
+                                    {projects.map(p => (
+                                        <option key={p.id} value={p.id}>{p.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                            <div className="input-group">
+                                <label>Team Head</label>
+                                <select required value={teamData.team_head_id}
+                                    onChange={e => setTeamData({...teamData, team_head_id: e.target.value})}>
+                                    <option value="">Select...</option>
+                                    {developers.map(d => (
+                                        <option key={d.id} value={d.id}>{d.name}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        </div>
+
+                        <div className="input-group">
+                            <label>Team Members</label>
+                            <div style={{border: '1px solid #bdc3c7', borderRadius: '6px', padding: '10px', maxHeight: '200px', overflowY: 'auto'}}>
+                                {developers.map(dev => (
+                                    <label key={dev.id} style={{display: 'flex', alignItems: 'center', marginBottom: '8px', cursor: 'pointer'}}>
+                                        <input type="checkbox" 
+                                            checked={teamData.member_ids.includes(dev.id)}
+                                            onChange={() => handleMemberToggle(dev.id)}
+                                            style={{marginRight: '10px', width: 'auto'}} />
+                                        {dev.name}
+                                    </label>
+                                ))}
+                            </div>
+                        </div>
+
+                        <button type="submit" className="ds-btn" style={{marginTop: '15px', width: '100%'}}>Create Team</button>
+                    </form>
+                </div>
+            );
+        };
+
+        const CreateProjectSection = ({ darkMode }) => {
+            const [projectData, setProjectData] = React.useState({
+                name: '',
+                description: '',
+                start_date: ''
+            });
+            const [loading, setLoading] = React.useState(false);
+            const [success, setSuccess] = React.useState('');
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                setLoading(true);
+
+                try {
+                    const response = await fetch('/api/create-project', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(projectData)
+                    });
+                    
+                    if (response.ok) {
+                        setSuccess('✅ Project created successfully!');
+                        setProjectData({ name: '', description: '', start_date: '' });
+                        setTimeout(() => setSuccess(''), 3000);
+                    }
+                } catch (err) {
+                    alert("❌ Error creating project");
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <div className={`ds-form-card ${darkMode ? 'dark-mode' : ''}`}>
+                    <h3>Create New Project</h3>
+                    {success && <div className="alert alert-success">{success}</div>}
+                    <form onSubmit={handleSubmit} style={{marginTop: '20px'}}>
+                        <div className="input-group">
+                            <label>Project Name *</label>
+                            <input type="text" placeholder="e.g. E-Commerce Platform" required
+                                value={projectData.name}
+                                onChange={e => setProjectData({...projectData, name: e.target.value})} />
+                        </div>
+
+                        <div className="input-group">
+                            <label>Description</label>
+                            <textarea placeholder="Project description..." rows="4"
+                                value={projectData.description}
+                                onChange={e => setProjectData({...projectData, description: e.target.value})} />
+                        </div>
+
+                        <div className="input-group">
+                            <label>Start Date</label>
+                            <input type="date"
+                                value={projectData.start_date}
+                                onChange={e => setProjectData({...projectData, start_date: e.target.value})} />
+                        </div>
+
+                        <button type="submit" className="ds-btn" disabled={loading} style={{width: '100%'}}>
+                            {loading ? 'Creating...' : 'Create Project'}
+                        </button>
+                    </form>
+                </div>
+            );
+        };
+    </script>
+    <style>
+        /* CreateTeam.css */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .ds-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f4f7f9;
+        }
+
+        .ds-form-card {
+            background: #ffffff;
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 450px;
+            margin: 20px;
+        }
+
+        .ds-header {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+
+        .ds-header h2 {
+            margin: 0;
+            color: #2c3e50;
+            font-size: 24px;
+            font-weight: 600;
+        }
+
+        .highlight {
+            color: #3498db;
+        }
+
+        .ds-header p {
+            color: #7f8c8d;
+            margin-top: 8px;
+            font-size: 14px;
+        }
+
+        .ds-form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        .input-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #2c3e50;
+            font-weight: 500;
+            margin-bottom: 8px;
+            font-size: 13px;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            transition: border-color 0.3s;
+        }
+
+        select {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
+            font-size: 14px;
+            font-family: inherit;
+            background-color: white;
+            cursor: pointer;
+        }
+
+        select:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+
+        input:focus, textarea:focus {
+            outline: none;
+            border-color: #3498db;
+            box-shadow: 0 0 5px rgba(52, 152, 219, 0.3);
+        }
+
+        .checkbox-group {
+            border: 1px solid #bdc3c7;
+            border-radius: 6px;
+            padding: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+            background-color: #f8f9fa;
+        }
+
+        .checkbox-label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 10px;
+            font-size: 14px;
+            color: #2c3e50;
+            cursor: pointer;
+        }
+
+        .checkbox-label:last-child {
+            margin-bottom: 0;
+        }
+
+        .checkbox-label input[type="checkbox"] {
+            width: auto;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+
+        .alert {
+            padding: 12px 15px;
+            border-radius: 6px;
+            margin-bottom: 15px;
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .alert-error {
+            background-color: #fadbd8;
+            color: #c0392b;
+            border: 1px solid #f5b7b1;
+        }
+
+        .alert-success {
+            background-color: #d5f4e6;
+            color: #27ae60;
+            border: 1px solid #a9dfbf;
+        }
+
+        .nav-btn {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #3498db;
+            background: white;
+            color: #3498db;
+            border-radius: 6px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            margin-top: 15px;
+        }
+
+        .nav-btn:hover {
+            background: #3498db;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 80px;
+        }
+
+        .ds-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            margin-top: 10px;
+        }
+
+        .ds-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <script type="text/babel">
+        const Manager = () => {
+            const [currentPage, setCurrentPage] = React.useState('teams');
+
+            return (
+                <>
+                    {currentPage === 'teams' ? (
+                        <CreateTeam setCurrentPage={setCurrentPage} />
+                    ) : (
+                        <CreateProject setCurrentPage={setCurrentPage} />
+                    )}
+                </>
+            );
+        };
+
+        const CreateProject = ({ setCurrentPage }) => {
+            const [projectData, setProjectData] = React.useState({
+                name: '',
+                description: '',
+                start_date: '',
+                expected_delivery_date: '',
+                client_email: '',
+                github_org: '',
+                github_repo: ''
+            });
+
+            const [clients, setClients] = React.useState([]);
+            const [loadingClients, setLoadingClients] = React.useState(true);
+            const [loading, setLoading] = React.useState(false);
+            const [error, setError] = React.useState('');
+            const [success, setSuccess] = React.useState('');
+
+            React.useEffect(() => {
+                const loadClients = async () => {
+                    try {
+                        const response = await fetch('/api/clients');
+                        if (response.ok) {
+                            const data = await response.json();
+                            setClients(data.clients || []);
+                        }
+                    } catch (err) {
+                        console.error('Failed to load clients', err);
+                    } finally {
+                        setLoadingClients(false);
+                    }
+                };
+
+                loadClients();
+            }, []);
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                
+                if (!projectData.name.trim()) {
+                    setError('❌ Project name is required');
+                    return;
+                }
+
+                if (!projectData.client_email) {
+                    setError('❌ Please choose a registered client for this project');
+                    return;
+                }
+
+                setLoading(true);
+                setError('');
+                setSuccess('');
+
+                try {
+                    const response = await fetch('/api/create-project', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({
+                            ...projectData,
+                            startDate: projectData.start_date,
+                            expectedDeliveryDate: projectData.expected_delivery_date
+                        })
+                    });
+                    
+                    const data = await response.json();
+                    
+                    if (response.ok) {
+                        setSuccess(`✅ ${data.message}`);
+                        setProjectData({ name: '', description: '', start_date: '', expected_delivery_date: '', client_email: '', github_org: '', github_repo: '' });
+                        setTimeout(() => {
+                            setSuccess('');
+                        }, 3000);
+                    } else {
+                        setError('❌ Error: ' + (data.error || 'Unknown error'));
+                    }
+                } catch (err) {
+                    setError('❌ Error connecting to DevSynx server.');
+                } finally {
+                    setLoading(false);
+                }
+            };
+
+            return (
+                <div className="ds-container">
+                    <div className="ds-form-card">
+                        <div className="ds-header">
+                            <h2>DevSynx <span className="highlight">Project Creator</span></h2>
+                            <p>Add a new project to the system</p>
+                        </div>
+
+                        {error && <div className="alert alert-error">{error}</div>}
+                        {success && <div className="alert alert-success">{success}</div>}
+
+                        <form className="ds-form" onSubmit={handleSubmit}>
+                            <div className="input-group">
+                                <label>Project Name *</label>
+                                <input type="text" placeholder="e.g. E-Commerce Platform" required
+                                    value={projectData.name}
+                                    onChange={e => setProjectData({...projectData, name: e.target.value})} />
+                            </div>
+
+                            <div className="input-group">
+                                <label>Description</label>
+                                <textarea placeholder="Describe your project..."
+                                    value={projectData.description}
+                                    onChange={e => setProjectData({...projectData, description: e.target.value})} />
+                            </div>
+
+                            <div className="input-group">
+                                <label>Client *</label>
+                                <select required value={projectData.client_email}
+                                    onChange={e => setProjectData({...projectData, client_email: e.target.value})}>
+                                    <option value="">Select a registered client...</option>
+                                    {loadingClients ? (
+                                        <option disabled>Loading clients...</option>
+                                    ) : clients.map(client => (
+                                        <option key={client.id} value={client.email}>{client.name} ({client.email})</option>
+                                    ))}
+                                </select>
+                                {!loadingClients && clients.length === 0 && (
+                                    <div style={{marginTop: '8px', fontSize: '13px', color: '#7f8c8d'}}>
+                                        No registered clients available yet.
+                                    </div>
+                                )}
+                            </div>
+
+                            <div className="input-group">
+                                <label>Start Date</label>
+                                <input type="date"
+                                    value={projectData.start_date}
+                                    onChange={e => setProjectData({...projectData, start_date: e.target.value})} />
+                            </div>
+
+                            <div className="input-group">
+                                <label>Expected Delivery Date</label>
+                                <input type="date"
+                                    value={projectData.expected_delivery_date}
+                                    onChange={e => setProjectData({...projectData, expected_delivery_date: e.target.value})} />
+                            </div>
+
+                            <div className="input-group">
+                                <label>Company GitHub Org</label>
+                                <input type="text" placeholder="e.g. your-company"
+                                    value={projectData.github_org}
+                                    onChange={e => setProjectData({...projectData, github_org: e.target.value})} />
+                            </div>
+
+                            <div className="input-group">
+                                <label>GitHub Repo (optional)</label>
+                                <input type="text" placeholder="e.g. backend-api or your-company/backend-api"
+                                    value={projectData.github_repo}
+                                    onChange={e => setProjectData({...projectData, github_repo: e.target.value})} />
+                            </div>
+
+                            <button type="submit" className="ds-btn" disabled={loading}>
+                                {loading ? 'Creating...' : 'Create Project'}
+                            </button>
+                        </form>
+
+                        <button className="nav-btn" onClick={() => setCurrentPage('teams')}>
+                            → Go to Create Teams
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        const CreateTeam = ({ setCurrentPage }) => {
+            const [teamData, setTeamData] = React.useState({
+                team_name: '',
+                project_id: '',
+                team_head_id: '',
+                member_ids: []
+            });
+
+            const [developers, setDevelopers] = React.useState([]);
+            const [projects, setProjects] = React.useState([]);
+            const [loading, setLoading] = React.useState(true);
+            const [error, setError] = React.useState('');
+
+            // Load developers and projects on component mount
+            React.useEffect(() => {
+                const loadData = async () => {
+                    try {
+                        const [devRes, projRes] = await Promise.all([
+                            fetch('/api/developers'),
+                            fetch('/api/projects')
+                        ]);
+
+                        if (!devRes.ok || !projRes.ok) {
+                            throw new Error('Failed to load data from server');
+                        }
+
+                        const developersData = await devRes.json();
+                        const projectsData = await projRes.json();
+
+                        setDevelopers(developersData);
+                        setProjects(projectsData);
+                        setLoading(false);
+                    } catch (err) {
+                        setError('❌ Cannot connect to server. Make sure backend is running on port 5000.');
+                        setLoading(false);
+                    }
+                };
+
+                loadData();
+            }, []);
+
+            const handleMemberToggle = (devId) => {
+                const current = teamData.member_ids;
+                const index = current.indexOf(devId);
+                let updated;
+                if (index > -1) {
+                    updated = [...current.slice(0, index), ...current.slice(index + 1)];
+                } else {
+                    updated = [...current, devId];
+                }
+                setTeamData({ ...teamData, member_ids: updated });
+            };
+
+            const handleSubmit = async (e) => {
+                e.preventDefault();
+                
+                if (!teamData.team_name || !teamData.project_id || !teamData.team_head_id || teamData.member_ids.length === 0) {
+                    alert('❌ Please fill in all fields');
+                    return;
+                }
+
+                try {
+                    const response = await fetch('/api/create-team', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(teamData)
+                    });
+                    
+                    if (response.ok) {
+                        alert("✅ Team successfully deployed to DevSynx!");
+                        setTeamData({ team_name: '', project_id: '', team_head_id: '', member_ids: [] });
+                    } else {
+                        const data = await response.json();
+                        alert("❌ Error: " + (data.error || 'Unknown error'));
+                    }
+                } catch (err) {
+                    alert("❌ Error connecting to DevSynx server.");
+                }
+            };
+
+            if (loading) {
+                return (
+                    <div className="ds-container">
+                        <div className="ds-form-card">
+                            <p style={{textAlign: 'center', color: '#7f8c8d'}}>Loading...</p>
+                        </div>
+                    </div>
+                );
+            }
+
+            return (
+                <div className="ds-container">
+                    <div className="ds-form-card">
+                        <div className="ds-header">
+                            <h2>DevSynx <span className="highlight">Manager Console</span></h2>
+                            <p>Create a new software development team</p>
+                        </div>
+
+                        {error && <div className="alert alert-error">{error}</div>}
+
+                        <form className="ds-form" onSubmit={handleSubmit}>
+                            <div className="input-group">
+                                <label>Team Name</label>
+                                <input type="text" placeholder="e.g. Blue-Squad" required
+                                    value={teamData.team_name}
+                                    onChange={e => setTeamData({...teamData, team_name: e.target.value})} />
+                            </div>
+
+                            <div className="input-row">
+                                <div className="input-group">
+                                    <label>Project</label>
+                                    <select required value={teamData.project_id} 
+                                        onChange={e => setTeamData({...teamData, project_id: e.target.value})}>
+                                        <option value="">Select a project...</option>
+                                        {projects.map(p => (
+                                            <option key={p.id} value={p.id}>{p.name} (ID: {p.id})</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div className="input-group">
+                                    <label>Team Head</label>
+                                    <select required value={teamData.team_head_id}
+                                        onChange={e => setTeamData({...teamData, team_head_id: e.target.value})}>
+                                        <option value="">Select team head...</option>
+                                        {developers.map(d => (
+                                            <option key={d.id} value={d.id}>{d.name} (ID: {d.id})</option>
+                                        ))}
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div className="input-group">
+                                <label>Select Team Members</label>
+                                <div className="checkbox-group">
+                                    {developers.map(dev => (
+                                        <label key={dev.id} className="checkbox-label">
+                                            <input type="checkbox" 
+                                                checked={teamData.member_ids.includes(dev.id)}
+                                                onChange={() => handleMemberToggle(dev.id)} />
+                                            {dev.name} (ID: {dev.id})
+                                        </label>
+                                    ))}
+                                </div>
+                            </div>
+
+                            <button type="submit" className="ds-btn">Initialize Team</button>
+                        </form>
+
+                        <button className="nav-btn" onClick={() => setCurrentPage('projects')}>
+                            → Create New Project
+                        </button>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<Manager />);
+    </script>
+</body>
+</html>

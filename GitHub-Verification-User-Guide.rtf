@@ -1,0 +1,71 @@
+{\rtf1\ansi\deff0
+{\fonttbl{\f0 Calibri;}{\f1 Consolas;}}
+\fs32\b DevSynx GitHub Verification User Guide\b0\fs24\par
+\par
+This guide explains how to configure and use the GitHub verification feature in DevSynx.\par
+\par
+\b 1. Start DevSynx\b0\par
+1. Start XAMPP and click Start next to MySQL.\par
+2. Start the DevSynx backend server.\par
+3. Open the application login page.\par
+4. Log in with a Manager account.\par
+\par
+\b 2. Configure the company GitHub account\b0\par
+From the Manager Dashboard, open \b Company GitHub Account\b0. Enter these values:\par
+\par
+\b GitHub organization or account\b0\par
+Enter the GitHub username or organization that owns the repository.\par
+Example: \f1 acme-company\f0\par
+\par
+\b Repository\b0\par
+Enter the repository name.\par
+Example: \f1 devsynx\f0\par
+Do not enter the complete URL unless the application specifically asks for it.\par
+\par
+\b GitHub access token\b0\par
+Paste a GitHub personal access token. It commonly starts with \f1 github_pat_\f0.\par
+The token allows DevSynx to read repository contents, commits, and pull requests. Give it only the minimum read permissions needed for the repository. Never share it or commit it into source code.\par
+\par
+Click \b Save GitHub Account\b0. The token is stored on the server and is not shown again in the browser.\par
+\par
+\b 3. Developer workflow\b0\par
+1. A manager or team head assigns a task to a developer.\par
+2. The developer works on the task locally.\par
+3. The developer pushes the code to the configured GitHub repository or opens a pull request.\par
+4. The commit message or pull request should mention the task name. Including the task ID is also recommended.\par
+5. The developer changes the task status to \b In Progress\b0 or \b Completed\b0.\par
+6. DevSynx automatically contacts GitHub and performs a check.\par
+\par
+\b 4. What DevSynx checks\b0\par
+DevSynx searches the configured repository for:\par
+- A commit whose message matches the task name or related task words.\par
+- A pull request whose title or description matches the task name or related task words.\par
+- If an exact GitHub file path is configured, whether that file exists in the repository.\par
+\par
+When a task is changed to \b Completed\b0, the task update is rejected if the GitHub check cannot find acceptable evidence.\par
+\par
+\b 5. Important limitation\b0\par
+The current implementation verifies that matching work exists in the configured repository. It does not reliably verify that the commit or pull request was created by the specific developer assigned to the task.\par
+\par
+For example, if Developer A is assigned a task but Developer B pushes a commit with the same task name, the current check may still accept it. An exact file-path check verifies that the file exists, but does not verify who created or modified it.\par
+\par
+\b 6. Recommended commit format\b0\par
+Use a commit message that includes both the task ID and task name:\par
+\par
+\f1 Task 42: Add login validation\f0\par
+\par
+This makes it easier for DevSynx to find the correct GitHub evidence.\par
+\par
+\b 7. If verification fails\b0\par
+Check the following:\par
+- MySQL and the DevSynx backend are running.\par
+- The GitHub organization/account is spelled correctly.\par
+- The repository name is spelled correctly.\par
+- The token is valid and has permission to read the repository.\par
+- The developer pushed the commit to the configured repository.\par
+- The commit message or pull request mentions the task name or task ID.\par
+- The configured file path is exact, including folder names and file extension.\par
+\par
+\b Summary\b0\par
+After the Manager saves the GitHub account, verification runs automatically when developers change task status. It checks for matching GitHub evidence; it does not upload code and it does not currently prove the identity of the developer who made the upload.\par
+}

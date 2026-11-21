@@ -1,0 +1,8 @@
+{
+  "name": "devsynx-workspace",
+  "private": true,
+  "scripts": {
+    "start": "node backend/server.js",
+    "backend": "node backend/server.js"
+  }
+}

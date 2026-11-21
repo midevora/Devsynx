@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Divide Project into Tasks - DevSynx</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
+                'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+                sans-serif;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        #root {
+            width: 100%;
+            min-height: 100vh;
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <!-- React Library -->
+    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+
+    <!-- Babel for JSX -->
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+
+    <!-- API Module -->
+    <script src="src/modules/teamhead/teamHeadApi.js"></script>
+
+    <!-- Component with JSX -->
+    <script type="text/babel">
+        const TaskDivision = function() {
+          const [teamData, setTeamData] = React.useState(null);
+          const [teamMembers, setTeamMembers] = React.useState([]);
+          const [tasks, setTasks] = React.useState([]);
+          const [existingTasks, setExistingTasks] = React.useState([]);
+          const [currentTaskId, setCurrentTaskId] = React.useState(1);
+          const [loading, setLoading] = React.useState(true);
+          const [error, setError] = React.useState('');
+          const [message, setMessage] = React.useState('');
+          const [creatingTasks, setCreatingTasks] = React.useState(false);
+          const [darkMode, setDarkMode] = React.useState(localStorage.getItem('darkMode') === 'true');
+
+          React.useEffect(() => {
+            console.log('📍 TaskDivision component mounted');
+            loadTeamData();
+            // Update body background when dark mode changes
+            document.body.style.backgroundColor = darkMode ? '#121212' : '#f5f7fa';
+          }, [darkMode]);
+
+          React.useEffect(() => {
+            console.log('📍 Loading team data from localStorage...');
+            loadTeamData();
+          }, []);
+
+          const loadTeamData = async () => {
+            try {
+              setLoading(true);
+              console.log('📍 Loading team data from localStorage...');
+              const storedTeam = localStorage.getItem('currentTeam');
+              console.log('📍 currentTeam from localStorage:', storedTeam);
+              
+              if (!storedTeam) {
+                console.warn('⚠️ No currentTeam in localStorage');
+                setError('No team selected. Please go back to dashboard and select a team.');
+                setLoading(false);
+                return;
+              }
+
+              const team = JSON.parse(storedTeam);
+              console.log('✅ Team loaded:', team);
+              setTeamData(team);
+
+              // Fetch team members
+              console.log('🔄 Fetching team members for team ID:', team.id);
+              const members = await window.TEAMHEAD_API.getTeamMembers(team.id);
+              console.log('✅ Team members loaded:', members);
+              setTeamMembers(members || []);
+
+              // Load existing tasks for this team
+              console.log('🔄 Fetching existing tasks for team ID:', team.id);
+              const existingTasksData = await window.TEAMHEAD_API.getTeamTasks(team.id);
+              console.log('✅ Existing tasks loaded:', existingTasksData);
+              setExistingTasks(existingTasksData || []);
+
+              setLoading(false);
+            } catch (err) {
+              console.error('❌ Error loading team data:', err);
+              setError('Error: ' + err.message);
+              setLoading(false);
+            }
+          };
+
+          const addTask = () => {
+            const newTask = {
+              id: currentTaskId,
+              taskName: '',
+              description: '',
+              githubFilePath: '',
+              complexity: 'medium',
+              developer: ''
+            };
+            setTasks([...tasks, newTask]);
+            setCurrentTaskId(currentTaskId + 1);
+          };
+
+          const updateTask = (id, field, value) => {
+            setTasks(tasks.map(task =>
+              task.id === id ? { ...task, [field]: value } : task
+            ));
+          };
+
+          const removeTask = (id) => {
+            setTasks(tasks.filter(task => task.id !== id));
+          };
+
+          const validateAndSubmit = async (e) => {
+            e.preventDefault();
+            setError('');
+            setMessage('');
+
+            if (tasks.length === 0) {
+              setError('Please add at least one task');
+              return;
+            }
+
+            const invalidTasks = tasks.filter(t => !t.taskName.trim() || !t.developer || !t.githubFilePath.trim());
+            if (invalidTasks.length > 0) {
+              setError('All tasks must have a name, assigned developer, and GitHub file path');
+              return;
+            }
+
+            setCreatingTasks(true);
+            try {
+              const user = JSON.parse(localStorage.getItem('user'));
+              console.log('📍 Creating tasks for user:', user);
+              
+              for (const task of tasks) {
+                console.log('📍 Creating task:', task);
+                await window.TEAMHEAD_API.createTask(
+                  teamData.id,
+                  parseInt(task.developer),
+                  task.taskName,
+                  task.description,
+                  task.complexity,
+                  user.developerId || 1,
+                  task.githubFilePath
+                );
+              }
+
+              const createdCount = tasks.length;
+              setMessage(`✅ Successfully created ${createdCount} task(s)!`);
+              
+              // Clear form and reload existing tasks
+              setTasks([]);
+              setCurrentTaskId(1);
+
+              // Reload existing tasks to show them in sidebar
+              const updatedTasks = await window.TEAMHEAD_API.getTeamTasks(teamData.id);
+              console.log('✅ Updated existing tasks:', updatedTasks);
+              setExistingTasks(updatedTasks || []);
+
+              // Clear success message after 3 seconds
+              setTimeout(() => setMessage(''), 3000);
+            } catch (err) {
+              console.error('❌ Error creating tasks:', err);
+              setError('Failed to create tasks: ' + err.message);
+            } finally {
+              setCreatingTasks(false);
+            }
+          };
+
+          const goBack = () => {
+            localStorage.removeItem('currentTeam');
+            window.location.href = 'teamhead.html';
+          };
+
+          const getStyles = () => {
+            return {
+              wrapper: { minHeight: '100vh', padding: '20px', backgroundColor: darkMode ? '#121212' : '#f5f7fa', color: darkMode ? '#e0e0e0' : '#2c3e50' },
+              navbar: { background: darkMode ? 'linear-gradient(135deg, #2a2a3e 0%, #1e1e2e 100%)' : 'linear-gradient(135deg, #3498db 0%, #2980b9 100%)', color: '#ffffff', padding: '15px 30px', borderRadius: '8px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '30px', boxShadow: '0 4px 15px rgba(0, 0, 0, 0.3)', border: darkMode ? '1px solid #404050' : 'none' },
+              mainContainer: { maxWidth: '1400px', margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '20px' },
+              sidebar: { backgroundColor: darkMode ? '#1e1e2e' : '#ffffff', padding: '20px', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)', height: 'fit-content', maxHeight: '80vh', overflowY: 'auto', border: darkMode ? '1px solid #404050' : 'none' },
+              formContainer: { backgroundColor: darkMode ? '#1e1e2e' : '#ffffff', padding: '30px', borderRadius: '8px', boxShadow: '0 2px 8px rgba(0, 0, 0, 0.3)', border: darkMode ? '1px solid #404050' : 'none' },
+              sidebarTitle: { fontSize: '16px', fontWeight: '600', color: darkMode ? '#e0e0e0' : '#2c3e50', marginBottom: '15px', borderBottom: darkMode ? '2px solid #667eea' : '2px solid #3498db', paddingBottom: '10px' },
+              sidebarSection: { marginBottom: '30px' },
+              projectSection: { backgroundColor: darkMode ? '#2a2a3e' : '#f8f9fa', padding: '20px', borderRadius: '8px', marginBottom: '30px', borderLeft: '4px solid ' + (darkMode ? '#667eea' : '#3498db') },
+              projectTitle: { fontSize: '18px', fontWeight: '600', color: darkMode ? '#e0e0e0' : '#2c3e50', marginBottom: '10px' },
+              projectDesc: { color: darkMode ? '#b0b0b0' : '#7f8c8d', fontSize: '14px', marginBottom: '10px' },
+              newTaskCard: { backgroundColor: darkMode ? '#2a2a3e' : '#ffffff', border: darkMode ? '1px solid #404050' : '2px solid #e9ecef', borderRadius: '8px', padding: '20px', marginBottom: '15px' },
+              existingTaskCard: { backgroundColor: darkMode ? '#2a3f5f' : '#f0f8ff', border: darkMode ? '1px solid #3d5a7f' : '1px solid #3498db', borderRadius: '6px', padding: '12px', marginBottom: '10px' },
+              taskHeader: { display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '15px' },
+              taskTitle: { fontSize: '14px', fontWeight: '600', color: darkMode ? '#e0e0e0' : '#2c3e50' },
+              removeBtn: { backgroundColor: '#e74c3c', color: '#ffffff', border: 'none', padding: '6px 12px', borderRadius: '4px', cursor: 'pointer', fontSize: '12px' },
+              formRow: { display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '15px', marginBottom: '15px' },
+              formGroup: { display: 'flex', flexDirection: 'column' },
+              label: { fontSize: '13px', fontWeight: '600', marginBottom: '5px', color: darkMode ? '#e0e0e0' : '#2c3e50' },
+              input: { padding: '10px', border: darkMode ? '1px solid #404050' : '1px solid #ddd', borderRadius: '4px', fontSize: '14px', fontFamily: 'inherit', backgroundColor: darkMode ? '#1e1e2e' : '#ffffff', color: darkMode ? '#e0e0e0' : '#2c3e50' },
+              textarea: { padding: '10px', border: darkMode ? '1px solid #404050' : '1px solid #ddd', borderRadius: '4px', fontSize: '14px', fontFamily: 'inherit', minHeight: '60px', resize: 'vertical', backgroundColor: darkMode ? '#1e1e2e' : '#ffffff', color: darkMode ? '#e0e0e0' : '#2c3e50' },
+              select: { padding: '10px', border: darkMode ? '1px solid #404050' : '1px solid #ddd', borderRadius: '4px', fontSize: '14px', fontFamily: 'inherit', cursor: 'pointer', backgroundColor: darkMode ? '#1e1e2e' : '#ffffff', color: darkMode ? '#e0e0e0' : '#2c3e50' },
+              buttonGroup: { display: 'flex', gap: '10px', marginTop: '30px', justifyContent: 'center' },
+              primaryBtn: { backgroundColor: '#27ae60', color: '#ffffff', border: 'none', padding: '12px 30px', borderRadius: '6px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' },
+              secondaryBtn: { backgroundColor: darkMode ? '#404050' : '#95a5a6', color: '#ffffff', border: darkMode ? '1px solid #505060' : 'none', padding: '12px 30px', borderRadius: '6px', fontSize: '14px', fontWeight: '600', cursor: 'pointer' },
+              addTaskBtn: { backgroundColor: darkMode ? '#667eea' : '#3498db', color: '#ffffff', border: 'none', padding: '10px 20px', borderRadius: '6px', fontSize: '14px', fontWeight: '600', cursor: 'pointer', marginBottom: '20px' },
+              message: { padding: '12px', borderRadius: '6px', marginBottom: '15px', fontSize: '14px' },
+              successMessage: { backgroundColor: darkMode ? '#1a4d2e' : '#d4edda', color: darkMode ? '#00ff41' : '#155724', border: darkMode ? '1px solid #2d7a3f' : '1px solid #c3e6cb' },
+              errorMessage: { backgroundColor: darkMode ? '#4d1a1a' : '#f8d7da', color: darkMode ? '#ff6b6b' : '#721c24', border: darkMode ? '1px solid #7a2d2d' : '1px solid #f5c6cb' },
+              taskMeta: { fontSize: '11px', color: darkMode ? '#999999' : '#7f8c8d', marginTop: '5px' }
+            };
+          };
+
+          const styles = getStyles();
+
+          if (loading) {
+            return <div style={styles.wrapper}><div style={{ textAlign: 'center', padding: '40px', fontSize: '18px' }}>⏳ Loading team data...</div></div>;
+          }
+
+          if (error && !teamData) {
+            return <div style={styles.wrapper}><div style={{ ...styles.formContainer, maxWidth: '600px', margin: '50px auto' }}><div style={{ ...styles.message, ...styles.errorMessage }}>{error}</div><button onClick={goBack} style={styles.secondaryBtn}>← Back to Dashboard</button></div></div>;
+          }
+
+          if (!teamData) {
+            return <div style={styles.wrapper}><div style={{ ...styles.formContainer, maxWidth: '600px', margin: '50px auto' }}><div style={{ ...styles.message, ...styles.errorMessage }}>Unable to load team data</div><button onClick={goBack} style={styles.secondaryBtn}>← Back to Dashboard</button></div></div>;
+          }
+
+          return (
+            <div style={styles.wrapper}>
+              <div style={styles.navbar}>
+                <h1 style={{ fontSize: '24px' }}>✂️ Divide Project into Tasks</h1>
+                <button onClick={goBack} style={{ backgroundColor: 'rgba(255,255,255,0.2)', color: '#ffffff', border: '1px solid rgba(255,255,255,0.5)', padding: '8px 16px', borderRadius: '5px', cursor: 'pointer', fontWeight: '600' }}>← Back</button>
+              </div>
+              <div style={styles.mainContainer}>
+                <div style={styles.sidebar}>
+                  {/* Existing Tasks Section */}
+                  <div style={styles.sidebarSection}>
+                    <div style={styles.sidebarTitle}>📋 Existing Tasks ({existingTasks.length})</div>
+                    {existingTasks.length === 0 ? (
+                      <p style={{ color: darkMode ? '#b0b0b0' : '#95a5a6', textAlign: 'center', padding: '15px 0', fontSize: '13px' }}>No tasks created yet</p>
+                    ) : (
+                      existingTasks.map(task => (
+                        <div key={task.id} style={styles.existingTaskCard}>
+                          <div style={{ fontWeight: '600', color: darkMode ? '#e0e0e0' : '#2c3e50', fontSize: '13px' }}>{task.task_name}</div>
+                          <div style={styles.taskMeta}>Dev: {task.developer_name || 'N/A'}</div>
+                          <div style={styles.taskMeta}>Status: {task.status}</div>
+                          {task.complexity && <div style={styles.taskMeta}>Complexity: {task.complexity}</div>}
+                        </div>
+                      ))
+                    )}
+                  </div>
+
+                  {/* New Tasks to Add Section */}
+                  <div style={styles.sidebarSection}>
+                    <div style={styles.sidebarTitle}>➕ New Tasks to Create ({tasks.length})</div>
+                    {tasks.length === 0 ? (
+                      <p style={{ color: darkMode ? '#b0b0b0' : '#95a5a6', textAlign: 'center', padding: '15px 0', fontSize: '13px' }}>No new tasks yet</p>
+                    ) : (
+                      tasks.map((task, idx) => (
+                        <div key={task.id} style={styles.existingTaskCard}>
+                          <div style={{ fontWeight: '600', color: darkMode ? '#e0e0e0' : '#2c3e50', fontSize: '13px' }}>{task.taskName || `Task ${idx + 1}`}</div>
+                          <div style={styles.taskMeta}>Complexity: {task.complexity}</div>
+                          {task.developer && <div style={styles.taskMeta}>Dev ID: {task.developer}</div>}
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+                <div style={styles.formContainer}>
+                  <div style={styles.projectSection}>
+                    <div style={styles.projectTitle}>📁 {teamData.team_name}</div>
+                    <div style={{ fontSize: '14px', fontWeight: '500', color: darkMode ? '#e0e0e0' : '#2c3e50', marginBottom: '8px' }}>Project: {teamData.project_name}</div>
+                    {teamData.project_description && <div style={styles.projectDesc}>📝 {teamData.project_description}</div>}
+                  </div>
+                  {message && <div style={{ ...styles.message, ...styles.successMessage }}>{message}</div>}
+                  {error && <div style={{ ...styles.message, ...styles.errorMessage }}>{error}</div>}
+                  <form onSubmit={validateAndSubmit}>
+                    <h3 style={{ fontSize: '16px', fontWeight: '600', color: darkMode ? '#e0e0e0' : '#2c3e50', marginBottom: '15px' }}>➕ Create New Tasks</h3>
+                    {tasks.length === 0 && <p style={{ color: darkMode ? '#b0b0b0' : '#95a5a6', marginBottom: '15px' }}>No tasks added yet. Click "Add Task" to create one.</p>}
+                    {tasks.map((task, idx) => (
+                      <div key={task.id} style={styles.newTaskCard}>
+                        <div style={styles.taskHeader}>
+                          <span style={styles.taskTitle}>Task {idx + 1}</span>
+                          <button type="button" onClick={() => removeTask(task.id)} style={styles.removeBtn}>✕ Remove</button>
+                        </div>
+                        <div style={styles.formRow}>
+                          <div style={styles.formGroup}>
+                            <label style={styles.label}>Task Name *</label>
+                            <input type="text" value={task.taskName} onChange={(e) => updateTask(task.id, 'taskName', e.target.value)} placeholder="Enter task name" style={styles.input} required />
+                          </div>
+                          <div style={styles.formGroup}>
+                            <label style={styles.label}>Complexity *</label>
+                            <select value={task.complexity} onChange={(e) => updateTask(task.id, 'complexity', e.target.value)} style={styles.select}>
+                              <option value="low">🟢 Low</option>
+                              <option value="medium">🟡 Medium</option>
+                              <option value="high">🔴 High</option>
+                            </select>
+                          </div>
+                        </div>
+                        <div style={{ ...styles.formGroup, marginBottom: '15px' }}>
+                          <label style={styles.label}>GitHub file path *</label>
+                          <input type="text" value={task.githubFilePath} onChange={(e) => updateTask(task.id, 'githubFilePath', e.target.value)} placeholder="src/components/Feature.jsx" style={styles.input} required />
+                        </div>
+                        <div style={{ ...styles.formRow, marginBottom: '15px' }}>
+                          <div style={styles.formGroup}>
+                            <label style={styles.label}>Description</label>
+                            <textarea value={task.description} onChange={(e) => updateTask(task.id, 'description', e.target.value)} placeholder="Enter task description" style={styles.textarea} />
+                          </div>
+                          <div style={styles.formGroup}>
+                            <label style={styles.label}>Assign To *</label>
+                            <select value={task.developer} onChange={(e) => updateTask(task.id, 'developer', e.target.value)} style={styles.select} required>
+                              <option value="">-- Select Developer --</option>
+                              {teamMembers && teamMembers.map(member => (
+                                <option key={member.id} value={member.id}>{member.name || member.developer_name}</option>
+                              ))}
+                            </select>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    <button type="button" onClick={addTask} style={styles.addTaskBtn}>+ Add Task</button>
+                    <div style={styles.buttonGroup}>
+                      <button type="submit" style={{...styles.primaryBtn, opacity: creatingTasks || tasks.length === 0 ? 0.6 : 1}} disabled={creatingTasks || tasks.length === 0}>
+                        {creatingTasks ? '⏳ Creating...' : `✅ Create ${tasks.length} Task${tasks.length !== 1 ? 's' : ''}`}
+                      </button>
+                      <button type="button" onClick={goBack} style={styles.secondaryBtn}>← Back to Dashboard</button>
+                    </div>
+                  </form>
+                </div>
+              </div>
+            </div>
+          );
+        };
+
+        // Initialize
+        console.log('🎨 Initializing TaskDivision component');
+        window.addEventListener('DOMContentLoaded', () => {
+          console.log('📍 DOM loaded, rendering component');
+          const root = ReactDOM.createRoot(document.getElementById('root'));
+          root.render(<TaskDivision />);
+        });
+
+        // Also try immediate render in case DOMContentLoaded already fired
+        if (document.readyState === 'loading') {
+          // Document is still loading
+          console.log('📍 Document still loading, waiting for DOMContentLoaded');
+        } else {
+          // Document is already loaded
+          console.log('📍 Document already loaded, rendering immediately');
+          const root = ReactDOM.createRoot(document.getElementById('root'));
+          root.render(<TaskDivision />);
+        }
+    </script>
+</body>
+</html>
