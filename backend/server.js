@@ -70,5 +70,10 @@ app.use((req, res) => {
     res.status(404).json({ error: 'Route not found', path: req.path });
 });
 
-const port = Number(process.env.PORT || 5000);
-app.listen(port, '0.0.0.0', () => console.log(`Server running on port ${port}`));
+module.exports = app;
+
+// Local / EC2: listen. On Vercel the /api entry imports this module instead.
+if (require.main === module) {
+  const port = Number(process.env.PORT || 5000);
+  app.listen(port, '0.0.0.0', () => console.log(`Server running on port ${port}`));
+}

@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "start": "node backend/server.js",
-    "backend": "node backend/server.js"
+    "backend": "node backend/server.js",
+    "vercel-build": "node scripts/vercel-build.mjs"
   }
 }
