@@ -113,9 +113,10 @@ router.post('/signup', async (req, res) => {
             [email, password, name, role, developer_id]
         );
 
+        // Account is active immediately — no email / OTP verification step
         res.status(201).json({
             success: true,
-            message: `${role.charAt(0).toUpperCase() + role.slice(1)} account created successfully!`,
+            message: 'Account created successfully. You can log in now.',
             user: {
                 id: result.insertId,
                 email,

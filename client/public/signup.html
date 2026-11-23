@@ -240,12 +240,26 @@
                 const data = await response.json();
 
                 if (response.ok) {
-                    successMsg.textContent = '✅ Account created successfully! Redirecting to login...';
+                    // No email/OTP verification — create account and log in immediately
+                    successMsg.textContent = '✅ Account created! Logging you in...';
                     successMsg.style.display = 'block';
 
+                    localStorage.setItem('user', JSON.stringify(data.user));
+
                     setTimeout(() => {
-                        window.location.href = 'login.html';
-                    }, 2000);
+                        const role = data.user.role;
+                        if (role === 'manager') {
+                            window.location.href = 'manager.html';
+                        } else if (role === 'developer') {
+                            window.location.href = 'developer.html';
+                        } else if (role === 'team_head') {
+                            window.location.href = 'teamhead.html';
+                        } else if (role === 'client') {
+                            window.location.href = 'client.html';
+                        } else {
+                            window.location.href = 'login.html';
+                        }
+                    }, 800);
                 } else {
                     errorMsg.textContent = '❌ ' + (data.error || 'Signup failed');
                     errorMsg.style.display = 'block';
