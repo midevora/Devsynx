@@ -1,5 +1,8 @@
 {
   "buildCommand": "node scripts/vercel-build.mjs",
   "installCommand": "npm install --prefix backend",
-  "rewrites": [{ "source": "/(.*)", "destination": "/api" }]
+  "outputDirectory": "public",
+  "rewrites": [
+    { "source": "/api/(.*)", "destination": "/api" }
+  ]
 }
