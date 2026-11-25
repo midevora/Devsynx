@@ -101,10 +101,10 @@ const teamHeadService = {
       // Ensure tasks table exists with proper columns
       try {
         await connection.query(
-          `ALTER TABLE ds_tasks ADD COLUMN task_name VARCHAR(255) NOT NULL DEFAULT 'Untitled'`
+          `ALTER TABLE ds_tasks ADD COLUMN IF NOT EXISTS task_name VARCHAR(255) DEFAULT 'Untitled'`
         );
       } catch (err) {
-        // Column likely already exists
+        // Column likely already exists on older engines
       }
 
       const overloadAssessment = await taskOverloadService.assessDeveloperLoad(
