@@ -11,15 +11,32 @@ const STOPWORDS = new Set([
 
 const USER_AGENT = 'DevSynx-GitHub-Upload-Agent';
 const AI_MATCH_THRESHOLD = 60;
-const DEFAULT_GEMINI_MODEL = 'gemini-2.0-flash';
+const DEFAULT_GEMINI_MODEL = 'gemini-3.8-flash';
+const FALLBACK_GEMINI_MODELS = [
+  'gemini-3.6-flash',
+  'gemini-3.5-flash-lite',
+  'gemini-3.1-flash-lite',
+  'gemini-4-hydrogen',
+  'gemini-4-argon',
+  'gemini-4-neon',
+  'gemini-4-carbon',
+];
 
 function configuredGeminiModels() {
   const configured = (process.env.GEMINI_MODELS || '')
     .split(',')
     .map((m) => m.trim())
     .filter(Boolean);
-  if (configured.length) return configured;
-  return [(process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL).trim()];
+  const models = configured.length
+    ? configured
+    : [(process.env.GEMINI_MODEL || DEFAULT_GEMINI_MODEL).trim()];
+
+  for (const fallback of [DEFAULT_GEMINI_MODEL, ...FALLBACK_GEMINI_MODELS]) {
+    if (!models.includes(fallback)) {
+      models.push(fallback);
+    }
+  }
+  return models;
 }
 
 function isPlaceholderGeminiKey(apiKey) {

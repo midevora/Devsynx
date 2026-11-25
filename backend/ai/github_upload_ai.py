@@ -16,15 +16,27 @@ STOPWORDS = {
 
 USER_AGENT = "DevSynx-GitHub-Upload-Agent"
 AI_MATCH_THRESHOLD = 60
-DEFAULT_GEMINI_MODEL = "gemini-3.5-flash-lite"
+DEFAULT_GEMINI_MODEL = "gemini-3.8-flash"
+FALLBACK_GEMINI_MODELS = (
+    "gemini-3.6-flash",
+    "gemini-3.5-flash-lite",
+    "gemini-3.1-flash-lite",
+    "gemini-4-hydrogen",
+    "gemini-4-argon",
+    "gemini-4-neon",
+    "gemini-4-carbon",
+)
 
 
 def configured_gemini_models():
     configured_models = os.environ.get("GEMINI_MODELS", "").split(",")
     models = [model.strip() for model in configured_models if model.strip()]
-    if models:
-        return models
-    return [os.environ.get("GEMINI_MODEL", DEFAULT_GEMINI_MODEL).strip()]
+    if not models:
+        models = [os.environ.get("GEMINI_MODEL", DEFAULT_GEMINI_MODEL).strip()]
+    for fallback_model in (DEFAULT_GEMINI_MODEL, *FALLBACK_GEMINI_MODELS):
+        if fallback_model not in models:
+            models.append(fallback_model)
+    return models
 
 
 def tokenize(text):
