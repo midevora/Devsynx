@@ -1,8 +1,6 @@
 const fs = require('fs');
 const path = require('path');
-const { spawnSync } = require('child_process');
-
-const AI_SCRIPT_PATH = path.join(__dirname, '..', 'ai', 'github_upload_ai.py');
+const { analyzeUpload } = require('../ai/githubUploadAgent');
 
 function loadEnvFile() {
   const envPath = path.join(__dirname, '..', '.env');
@@ -32,8 +30,6 @@ function loadEnvFile() {
 }
 
 loadEnvFile();
-
-const PYTHON_EXECUTABLE = process.env.PYTHON_EXECUTABLE || 'C:/Python314/python.exe';
 
 async function addColumnIfMissing(connection, table, column, definition) {
   try {
@@ -91,29 +87,8 @@ async function saveGithubSettings(connection, { githubOrg, githubRepo, githubTok
   return getGithubSettings(connection);
 }
 
-function runGithubUploadAgent(payload) {
-  const result = spawnSync(PYTHON_EXECUTABLE, [AI_SCRIPT_PATH], {
-    input: JSON.stringify(payload),
-    encoding: 'utf8',
-    timeout: 120000,
-    env: {
-      ...process.env
-    }
-  });
-
-  if (result.error) {
-    throw result.error;
-  }
-
-  if (result.status !== 0) {
-    throw new Error(result.stdout || result.stderr || 'GitHub upload agent failed');
-  }
-
-  try {
-    return JSON.parse(result.stdout.trim());
-  } catch (error) {
-    throw new Error('GitHub upload agent returned invalid JSON');
-  }
+async function runGithubUploadAgent(payload) {
+  return analyzeUpload(payload);
 }
 
 async function getTaskGithubContext(connection, taskId) {
@@ -164,7 +139,7 @@ async function verifyTaskUploadedToGithub(connection, taskId) {
     return assessment;
   }
 
-  const assessment = runGithubUploadAgent({
+  const assessment = await runGithubUploadAgent({
     task_id: task.id,
     task_name: task.task_name,
     description: task.description || '',
