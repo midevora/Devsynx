@@ -1881,6 +1881,7 @@
             try {
                 console.log('🔄 Loading developer projects...');
                 console.log('📌 Current Developer Info:', currentDeveloper);
+                const previouslySelectedId = selectedProjectId;
                 
                 // Get all teams
                 const teamsResponse = await fetch('/api/teams');
@@ -1890,11 +1891,9 @@
                 allTeams = await teamsResponse.json();
                 console.log('📍 All teams from API:', allTeams);
 
-                // Create a map of teams by ID for quick lookup
-                const teamsMap = new Map(allTeams.map(t => [t.id, t]));
-
-                // Find all projects and tasks this developer is assigned to
-                const projectsMap = new Map();
+                // Reset so status updates don't append duplicate teams/tasks
+                projects = [];
+                developerTeams = [];
                 allTasksData = {};
 
                 // For each team, check if developer is a member
@@ -1911,13 +1910,12 @@
                         const members = await membersResponse.json();
                         console.log('👥 Team members:', members);
 
-                        // Check if current developer is in this team
+                        // Prefer id/email — name-only matches collide (e.g. Maryam / maryam)
                         const isMember = members.some(m => {
-                            const matchById = m.id === currentDeveloper.developer_id;
-                            const matchByEmail = m.email === currentDeveloper.email;
-                            const matchByName = m.name === currentDeveloper.name;
+                            const matchById = currentDeveloper.developer_id != null && m.id === currentDeveloper.developer_id;
+                            const matchByEmail = currentDeveloper.email && m.email === currentDeveloper.email;
                             
-                            if (matchById || matchByEmail || matchByName) {
+                            if (matchById || matchByEmail) {
                                 console.log(`  ✅ MATCH! Member ID: ${m.id}, Name: ${m.name}, Email: ${m.email}`);
                                 return true;
                             }
@@ -1926,7 +1924,9 @@
 
                         if (isMember) {
                             console.log('✅ Developer is member of team:', team.team_name);
-                            developerTeams.push(team);
+                            if (!developerTeams.some(t => t.id === team.id)) {
+                                developerTeams.push(team);
+                            }
                             console.log('📌 Added to developerTeams. Total now:', developerTeams.length);
 
                             // Get all tasks for this team
@@ -1935,15 +1935,14 @@
                                 const teamTasks = await tasksResponse.json();
                                 console.log('📋 Raw tasks for team', team.id, ':', teamTasks);
 
-                                // Filter tasks assigned to this developer
+                                // Filter tasks assigned to this developer (email first, then exact name)
                                 const developerTasks = teamTasks.filter(task => {
-                                    // Tasks have 'assigned_to' field with developer name
-                                    const matchByName = task.assigned_to === currentDeveloper.name;
-                                    const matchByEmail = task.developer_email === currentDeveloper.email;
+                                    const matchByEmail = currentDeveloper.email && task.developer_email === currentDeveloper.email;
+                                    const matchByName = !matchByEmail && task.assigned_to === currentDeveloper.name;
                                     
-                                    console.log(`  Task "${task.task_name}": assigned_to="${task.assigned_to}", dev_email="${task.developer_email}", match=${matchByName || matchByEmail}`);
+                                    console.log(`  Task "${task.task_name}": assigned_to="${task.assigned_to}", dev_email="${task.developer_email}", match=${matchByEmail || matchByName}`);
                                     
-                                    return matchByName || matchByEmail;
+                                    return matchByEmail || matchByName;
                                 });
 
                                 console.log(`✅ Found ${developerTasks.length}/${teamTasks.length} tasks for developer in team "${team.team_name}"`);
@@ -1971,14 +1970,26 @@
                     }
                 }
 
-                console.log('📁 Final projects for developer:', projects);
+                console.log('📁 Final teams for developer:', developerTeams);
                 console.log('📊 Tasks by project:', allTasksData);
 
-                if (projects.length === 0) {
+                if (developerTeams.length === 0) {
                     console.warn('⚠️ No projects found for developer');
                 }
 
                 renderProjectsInDrawer();
+
+                // Keep the open project in sync after status changes (without stacking duplicates)
+                if (previouslySelectedId != null) {
+                    const selected = developerTeams.find(t => t.id === previouslySelectedId);
+                    if (selected) {
+                        selectProject(
+                            selected.id,
+                            selected.team_name,
+                            selected.project_name || ''
+                        );
+                    }
+                }
             } catch (err) {
                 console.error('❌ Error loading developer projects:', err);
                 document.getElementById('drawerTeamsList').innerHTML = 
@@ -2061,9 +2072,10 @@
 
             // Filter tasks to show only those assigned to current developer
             const myTasks = tasks.filter(task => {
-                const assignedToDev = task.assigned_to === currentDeveloper.name || 
-                                     task.developer_email === currentDeveloper.email;
-                return assignedToDev;
+                if (currentDeveloper.email && task.developer_email === currentDeveloper.email) {
+                    return true;
+                }
+                return task.assigned_to === currentDeveloper.name;
             });
 
             console.log('🎯 Filtered tasks for developer:', myTasks.length, 'from', tasks.length);

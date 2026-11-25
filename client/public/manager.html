@@ -3716,9 +3716,11 @@
             const [formData, setFormData] = useState({
                 github_org: '',
                 github_repo: '',
-                github_token: ''
+                github_token: '',
+                gemini_api_key: ''
             });
             const [hasToken, setHasToken] = useState(false);
+            const [hasGeminiKey, setHasGeminiKey] = useState(false);
             const [loading, setLoading] = useState(true);
             const [saving, setSaving] = useState(false);
             const [message, setMessage] = useState('');
@@ -3730,8 +3732,14 @@
                     .then(async response => {
                         const data = await response.json();
                         if (!response.ok) throw new Error(data.error || 'Unable to load GitHub settings');
-                        setFormData({ github_org: data.github_org || '', github_repo: data.github_repo || '', github_token: '' });
+                        setFormData({
+                            github_org: data.github_org || '',
+                            github_repo: data.github_repo || '',
+                            github_token: '',
+                            gemini_api_key: ''
+                        });
                         setHasToken(Boolean(data.has_token));
+                        setHasGeminiKey(Boolean(data.has_gemini_key));
                     })
                     .catch(err => setError(err.message))
                     .finally(() => setLoading(false));
@@ -3757,7 +3765,8 @@
                     const data = await response.json();
                     if (!response.ok) throw new Error(data.error || 'Unable to save GitHub settings');
                     setHasToken(Boolean(data.has_token));
-                    setFormData(previous => ({ ...previous, github_token: '' }));
+                    setHasGeminiKey(Boolean(data.has_gemini_key));
+                    setFormData(previous => ({ ...previous, github_token: '', gemini_api_key: '' }));
                     setMessage('Company GitHub account saved. Task verification will use this repository.');
                 } catch (err) {
                     setError(err.message);
@@ -3776,7 +3785,7 @@
                     <div className="form-container">
                         <h2 style={{ marginBottom: '10px', color: '#2c3e50' }}>🐙 Company GitHub Account</h2>
                         <p style={{ marginBottom: '25px', color: '#7f8c8d' }}>
-                            This repository is used to verify developer task uploads. The access token is stored only on the server.
+                            This repository is used to verify developer task uploads. Tokens and Gemini keys are stored only on the server.
                         </p>
                         {loading && <div className="alert">Loading GitHub settings...</div>}
                         {message && <div className="alert alert-success">✅ {message}</div>}
@@ -3793,6 +3802,13 @@
                             <div className="form-group">
                                 <label htmlFor="settings_github_token">GitHub access token {hasToken ? '(leave blank to keep current token)' : ''}</label>
                                 <input id="settings_github_token" name="github_token" type="password" value={formData.github_token} onChange={handleInputChange} placeholder={hasToken ? 'Token already saved' : 'github_pat_...'} autoComplete="new-password" />
+                            </div>
+                            <div className="form-group">
+                                <label htmlFor="settings_gemini_api_key">Gemini API key {hasGeminiKey ? '(leave blank to keep current key)' : ''}</label>
+                                <input id="settings_gemini_api_key" name="gemini_api_key" type="password" value={formData.gemini_api_key} onChange={handleInputChange} placeholder={hasGeminiKey ? 'Gemini key already saved' : 'AIza...'} autoComplete="new-password" />
+                                <small style={{ color: hasGeminiKey ? '#27ae60' : '#e67e22', display: 'block', marginTop: '6px' }}>
+                                    {hasGeminiKey ? 'Gemini key is configured.' : 'No Gemini key found yet — AI task verification will fail without it.'}
+                                </small>
                             </div>
                             <button type="submit" className="submit-btn" disabled={saving}>
                                 {saving ? 'Saving...' : 'Save GitHub Account'}

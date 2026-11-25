@@ -62,14 +62,19 @@ async function githubGet(url, token) {
   }
 }
 
-async function assessCodeWithGemini(taskName, description, code) {
-  const apiKey = (process.env.GEMINI_API_KEY || '').trim();
+async function assessCodeWithGemini(taskName, description, code, apiKeyOverride) {
+  const apiKey = String(
+    apiKeyOverride ||
+      process.env.GEMINI_API_KEY ||
+      process.env.GOOGLE_API_KEY ||
+      ''
+  ).trim();
   const models = configuredGeminiModels();
 
   if (isPlaceholderGeminiKey(apiKey)) {
     return [
       null,
-      'GEMINI_API_KEY is missing or still contains a placeholder. Set a real key in Vercel env / backend/.env.',
+      'GEMINI_API_KEY is missing or still contains a placeholder. Set it in Manager → GitHub settings, or as GEMINI_API_KEY on Vercel.',
     ];
   }
 
@@ -254,6 +259,11 @@ async function analyzeUpload(payload = {}) {
   );
   repo = repoFromFileUrl || repo;
   const token = payload.github_token || process.env.GITHUB_TOKEN || '';
+  const geminiApiKey =
+    payload.gemini_api_key ||
+    process.env.GEMINI_API_KEY ||
+    process.env.GOOGLE_API_KEY ||
+    '';
   const taskId = payload.task_id;
 
   if (!org && !repo) {
@@ -330,7 +340,7 @@ async function analyzeUpload(payload = {}) {
     }
 
     const [aiAssessment, aiError] = code
-      ? await assessCodeWithGemini(taskName, description, code)
+      ? await assessCodeWithGemini(taskName, description, code, geminiApiKey)
       : [null, errors[errors.length - 1]];
 
     if (aiError) errors.push(aiError);
@@ -353,7 +363,7 @@ async function analyzeUpload(payload = {}) {
       reason,
       error_type: uploaded
         ? null
-        : isPlaceholderGeminiKey(process.env.GEMINI_API_KEY)
+        : isPlaceholderGeminiKey(geminiApiKey)
           ? 'configuration'
           : 'ai_check_failed',
       github_org: org,

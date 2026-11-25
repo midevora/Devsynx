@@ -51,10 +51,12 @@ async function ensureGithubSchema(connection) {
       github_org VARCHAR(255) NULL,
       github_repo VARCHAR(255) NULL,
       github_token TEXT NULL,
+      gemini_api_key TEXT NULL,
       updated_by VARCHAR(255) NULL,
       updated_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
+  await addColumnIfMissing(connection, 'ds_github_settings', 'gemini_api_key', 'TEXT');
   await addColumnIfMissing(connection, 'ds_projects', 'github_org', 'VARCHAR(255)');
   await addColumnIfMissing(connection, 'ds_projects', 'github_repo', 'VARCHAR(255)');
   await addColumnIfMissing(connection, 'ds_tasks', 'github_file_path', 'VARCHAR(500)');
@@ -66,23 +68,24 @@ async function ensureGithubSchema(connection) {
 async function getGithubSettings(connection) {
   await ensureGithubSchema(connection);
   const [rows] = await connection.query(
-    'SELECT github_org, github_repo, github_token, updated_by, updated_at FROM ds_github_settings WHERE id = 1 LIMIT 1'
+    'SELECT github_org, github_repo, github_token, gemini_api_key, updated_by, updated_at FROM ds_github_settings WHERE id = 1 LIMIT 1'
   );
   return rows[0] || null;
 }
 
-async function saveGithubSettings(connection, { githubOrg, githubRepo, githubToken, updatedBy }) {
+async function saveGithubSettings(connection, { githubOrg, githubRepo, githubToken, geminiApiKey, updatedBy }) {
   await ensureGithubSchema(connection);
   await connection.query(
-    `INSERT INTO ds_github_settings (id, github_org, github_repo, github_token, updated_by)
-     VALUES (1, ?, ?, ?, ?)
+    `INSERT INTO ds_github_settings (id, github_org, github_repo, github_token, gemini_api_key, updated_by)
+     VALUES (1, ?, ?, ?, ?, ?)
      ON CONFLICT (id) DO UPDATE SET
        github_org = EXCLUDED.github_org,
        github_repo = EXCLUDED.github_repo,
        github_token = COALESCE(NULLIF(EXCLUDED.github_token, ''), ds_github_settings.github_token),
+       gemini_api_key = COALESCE(NULLIF(EXCLUDED.gemini_api_key, ''), ds_github_settings.gemini_api_key),
        updated_by = EXCLUDED.updated_by,
        updated_at = NOW()`,
-    [githubOrg || null, githubRepo || null, githubToken || '', updatedBy || null]
+    [githubOrg || null, githubRepo || null, githubToken || '', geminiApiKey || '', updatedBy || null]
   );
   return getGithubSettings(connection);
 }
@@ -149,7 +152,12 @@ async function verifyTaskUploadedToGithub(connection, taskId) {
     github_org: task.github_org || settings?.github_org || process.env.GITHUB_ORG || '',
     github_repo: task.github_repo || settings?.github_repo || process.env.GITHUB_REPO || '',
     github_file_path: task.github_file_path || '',
-    github_token: settings?.github_token || process.env.GITHUB_TOKEN || ''
+    github_token: settings?.github_token || process.env.GITHUB_TOKEN || '',
+    gemini_api_key:
+      settings?.gemini_api_key ||
+      process.env.GEMINI_API_KEY ||
+      process.env.GOOGLE_API_KEY ||
+      '',
   });
 
   await connection.query(

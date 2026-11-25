@@ -42,6 +42,11 @@ router.get('/github-settings', async (req, res) => {
             github_org: settings?.github_org || '',
             github_repo: settings?.github_repo || '',
             has_token: Boolean(settings?.github_token),
+            has_gemini_key: Boolean(
+                settings?.gemini_api_key ||
+                process.env.GEMINI_API_KEY ||
+                process.env.GOOGLE_API_KEY
+            ),
             updated_by: settings?.updated_by || null,
             updated_at: settings?.updated_at || null
         });
@@ -54,7 +59,7 @@ router.get('/github-settings', async (req, res) => {
 
 // PUT company GitHub settings. An empty token preserves the existing token.
 router.put('/github-settings', async (req, res) => {
-    const { manager_email, github_org, github_repo, github_token } = req.body;
+    const { manager_email, github_org, github_repo, github_token, gemini_api_key } = req.body;
     let connection;
     try {
         connection = await db.promise().getConnection();
@@ -68,6 +73,7 @@ router.put('/github-settings', async (req, res) => {
             githubOrg: github_org.trim(),
             githubRepo: github_repo.trim(),
             githubToken: (github_token || '').trim(),
+            geminiApiKey: (gemini_api_key || '').trim(),
             updatedBy: manager_email
         });
         res.json({
@@ -75,7 +81,12 @@ router.put('/github-settings', async (req, res) => {
             message: 'Company GitHub account saved',
             github_org: settings.github_org,
             github_repo: settings.github_repo,
-            has_token: Boolean(settings.github_token)
+            has_token: Boolean(settings.github_token),
+            has_gemini_key: Boolean(
+                settings.gemini_api_key ||
+                process.env.GEMINI_API_KEY ||
+                process.env.GOOGLE_API_KEY
+            )
         });
     } catch (error) {
         res.status(500).json({ error: error.message });
