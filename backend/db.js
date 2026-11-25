@@ -273,12 +273,8 @@ async function ensureSchema() {
   }
 }
 
-async function ensureBootstrapManager() {
-  const email = process.env.BOOTSTRAP_MANAGER_EMAIL;
-  const password = process.env.BOOTSTRAP_MANAGER_PASSWORD;
-  const name = process.env.BOOTSTRAP_MANAGER_NAME || 'Manager';
+async function upsertManager({ email, password, name }) {
   if (!email || !password) return;
-
   const client = await pool.connect();
   try {
     const existing = await client.query('SELECT id FROM ds_users WHERE email = $1', [email]);
@@ -287,12 +283,35 @@ async function ensureBootstrapManager() {
         `INSERT INTO ds_users (email, password, name, role) VALUES ($1, $2, $3, 'manager')`,
         [email, password, name]
       );
-      console.log('✅ Bootstrap manager user created');
+      console.log(`✅ Manager created: ${email}`);
+    } else {
+      await client.query(
+        `UPDATE ds_users SET password = $1, name = $2, role = 'manager' WHERE email = $3`,
+        [password, name, email]
+      );
+      console.log(`✅ Manager updated: ${email}`);
     }
   } catch (err) {
     console.warn('⚠️ Manager bootstrap skipped:', err.message);
   } finally {
     client.release();
+  }
+}
+
+async function ensureBootstrapManager() {
+  // Classic DevSynx manager (used across local setup scripts / login UI)
+  await upsertManager({
+    email: 'manager@devsynx.com',
+    password: 'manager123',
+    name: 'DevSynx Manager',
+  });
+
+  // Optional override from Vercel env
+  const email = process.env.BOOTSTRAP_MANAGER_EMAIL;
+  const password = process.env.BOOTSTRAP_MANAGER_PASSWORD;
+  const name = process.env.BOOTSTRAP_MANAGER_NAME || 'Manager';
+  if (email && password && email !== 'manager@devsynx.com') {
+    await upsertManager({ email, password, name });
   }
 }
 
