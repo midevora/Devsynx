@@ -37,9 +37,12 @@ const PYTHON_EXECUTABLE = process.env.PYTHON_EXECUTABLE || 'C:/Python314/python.
 
 async function addColumnIfMissing(connection, table, column, definition) {
   try {
-    await connection.query(`ALTER TABLE ${table} ADD COLUMN ${column} ${definition}`);
+    await connection.query(
+      `ALTER TABLE ${table} ADD COLUMN IF NOT EXISTS ${column} ${definition}`
+    );
   } catch (error) {
-    if (error.code !== 'ER_DUP_FIELDNAME') {
+    // Column may already exist on older Postgres / race during cold start
+    if (!/already exists/i.test(error.message || '')) {
       throw error;
     }
   }
@@ -48,30 +51,20 @@ async function addColumnIfMissing(connection, table, column, definition) {
 async function ensureGithubSchema(connection) {
   await connection.query(`
     CREATE TABLE IF NOT EXISTS ds_github_settings (
-      id TINYINT PRIMARY KEY,
+      id INT PRIMARY KEY DEFAULT 1,
       github_org VARCHAR(255) NULL,
       github_repo VARCHAR(255) NULL,
       github_token TEXT NULL,
       updated_by VARCHAR(255) NULL,
-      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+      updated_at TIMESTAMPTZ DEFAULT NOW()
     )
   `);
-  await addColumnIfMissing(connection, 'ds_projects', 'github_org', 'VARCHAR(255) NULL');
-  await addColumnIfMissing(connection, 'ds_projects', 'github_repo', 'VARCHAR(255) NULL');
-  await addColumnIfMissing(connection, 'ds_tasks', 'github_file_path', 'VARCHAR(500) NULL');
-  await addColumnIfMissing(connection, 'ds_tasks', 'github_verified', 'TINYINT(1) NOT NULL DEFAULT 0');
-  await addColumnIfMissing(
-    connection,
-    'ds_tasks',
-    'github_check_summary',
-    'TEXT NULL'
-  );
-  await addColumnIfMissing(
-    connection,
-    'ds_tasks',
-    'github_evidence_url',
-    'VARCHAR(500) NULL'
-  );
+  await addColumnIfMissing(connection, 'ds_projects', 'github_org', 'VARCHAR(255)');
+  await addColumnIfMissing(connection, 'ds_projects', 'github_repo', 'VARCHAR(255)');
+  await addColumnIfMissing(connection, 'ds_tasks', 'github_file_path', 'VARCHAR(500)');
+  await addColumnIfMissing(connection, 'ds_tasks', 'github_verified', 'BOOLEAN NOT NULL DEFAULT FALSE');
+  await addColumnIfMissing(connection, 'ds_tasks', 'github_check_summary', 'TEXT');
+  await addColumnIfMissing(connection, 'ds_tasks', 'github_evidence_url', 'VARCHAR(500)');
 }
 
 async function getGithubSettings(connection) {
@@ -87,11 +80,12 @@ async function saveGithubSettings(connection, { githubOrg, githubRepo, githubTok
   await connection.query(
     `INSERT INTO ds_github_settings (id, github_org, github_repo, github_token, updated_by)
      VALUES (1, ?, ?, ?, ?)
-     ON DUPLICATE KEY UPDATE
-       github_org = VALUES(github_org),
-       github_repo = VALUES(github_repo),
-       github_token = COALESCE(NULLIF(VALUES(github_token), ''), github_token),
-       updated_by = VALUES(updated_by)`,
+     ON CONFLICT (id) DO UPDATE SET
+       github_org = EXCLUDED.github_org,
+       github_repo = EXCLUDED.github_repo,
+       github_token = COALESCE(NULLIF(EXCLUDED.github_token, ''), ds_github_settings.github_token),
+       updated_by = EXCLUDED.updated_by,
+       updated_at = NOW()`,
     [githubOrg || null, githubRepo || null, githubToken || '', updatedBy || null]
   );
   return getGithubSettings(connection);

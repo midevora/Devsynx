@@ -9,12 +9,11 @@ const githubUploadService = require('../services/githubUploadService');
 async function ensureClientProjectAccessTable(connection) {
     await connection.query(`
         CREATE TABLE IF NOT EXISTS ds_client_projects (
-            id INT AUTO_INCREMENT PRIMARY KEY,
+            id SERIAL PRIMARY KEY,
             client_email VARCHAR(255) NOT NULL,
-            project_id INT NOT NULL,
-            assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-            UNIQUE KEY unique_client_project (client_email, project_id),
-            FOREIGN KEY (project_id) REFERENCES ds_projects(id) ON DELETE CASCADE
+            project_id INT NOT NULL REFERENCES ds_projects(id) ON DELETE CASCADE,
+            assigned_at TIMESTAMPTZ DEFAULT NOW(),
+            UNIQUE (client_email, project_id)
         )
     `);
 }
@@ -336,7 +335,8 @@ router.post('/create-project', async (req, res) => {
         );
 
         await connection.query(
-            'INSERT IGNORE INTO ds_client_projects (client_email, project_id) VALUES (?, ?)',
+            `INSERT INTO ds_client_projects (client_email, project_id) VALUES (?, ?)
+             ON CONFLICT (client_email, project_id) DO NOTHING`,
             [clientEmail, result.projectId]
         );
 
