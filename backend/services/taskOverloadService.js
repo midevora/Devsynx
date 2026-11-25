@@ -1,28 +1,43 @@
-const path = require('path');
-const { spawnSync } = require('child_process');
+const WEIGHTS = {
+  low: 1,
+  medium: 2,
+  high: 3,
+};
 
-const PYTHON_EXECUTABLE = process.env.PYTHON_EXECUTABLE || 'C:/Python314/python.exe';
-const AI_SCRIPT_PATH = path.join(__dirname, '..', 'ai', 'task_overload_ai.py');
+const DEFAULT_CAPACITY = 10;
 
-function runLoadAssessment(payload) {
-  const result = spawnSync(PYTHON_EXECUTABLE, [AI_SCRIPT_PATH], {
-    input: JSON.stringify(payload),
-    encoding: 'utf8'
-  });
+function analyzeWorkload(payload = {}) {
+  const activeTasks = payload.active_tasks || [];
+  const newComplexity = String(payload.new_complexity || 'medium').toLowerCase();
+  const capacity = Number.parseInt(payload.capacity, 10) || DEFAULT_CAPACITY;
 
-  if (result.error) {
-    throw result.error;
+  let currentPoints = 0;
+  const breakdown = { low: 0, medium: 0, high: 0 };
+
+  for (const task of activeTasks) {
+    const complexity = String(task.complexity || 'medium').toLowerCase();
+    const points = WEIGHTS[complexity] ?? WEIGHTS.medium;
+    currentPoints += points;
+    if (Object.prototype.hasOwnProperty.call(breakdown, complexity)) {
+      breakdown[complexity] += 1;
+    }
   }
 
-  if (result.status !== 0) {
-    throw new Error(result.stdout || result.stderr || 'Failed to evaluate developer workload');
-  }
+  const newTaskPoints = WEIGHTS[newComplexity] ?? WEIGHTS.medium;
+  const projectedPoints = currentPoints + newTaskPoints;
+  const remainingCapacity = capacity - currentPoints;
 
-  try {
-    return JSON.parse(result.stdout.trim());
-  } catch (error) {
-    throw new Error('AI workload module returned invalid JSON');
-  }
+  return {
+    capacity,
+    current_points: currentPoints,
+    new_task_points: newTaskPoints,
+    projected_points: projectedPoints,
+    remaining_capacity: remainingCapacity,
+    active_task_count: activeTasks.length,
+    breakdown,
+    new_complexity: newComplexity,
+    overloaded: projectedPoints > capacity,
+  };
 }
 
 async function getDeveloperLoadSummary(connection, developerId) {
@@ -33,15 +48,15 @@ async function getDeveloperLoadSummary(connection, developerId) {
     [developerId]
   );
 
-  const assessment = runLoadAssessment({
+  const assessment = analyzeWorkload({
     active_tasks: activeTasks,
     new_complexity: 'low',
-    capacity: 10
+    capacity: DEFAULT_CAPACITY,
   });
 
   return {
     ...assessment,
-    overloaded: assessment.current_points >= assessment.capacity
+    overloaded: assessment.current_points >= assessment.capacity,
   };
 }
 
@@ -53,16 +68,15 @@ async function assessDeveloperLoad(connection, developerId, newComplexity) {
     [developerId]
   );
 
-  const payload = {
+  return analyzeWorkload({
     active_tasks: activeTasks,
     new_complexity: newComplexity,
-    capacity: 10
-  };
-
-  return runLoadAssessment(payload);
+    capacity: DEFAULT_CAPACITY,
+  });
 }
 
 module.exports = {
   assessDeveloperLoad,
-  getDeveloperLoadSummary
+  getDeveloperLoadSummary,
+  analyzeWorkload,
 };
